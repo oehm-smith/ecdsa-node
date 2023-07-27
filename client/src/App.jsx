@@ -25,6 +25,7 @@ function App() {
                 setBalance={setBalance}
                 address={address}
                 setAddress={setAddress}
+                loggedInUser={loggedInUser}
             />
             <Transfer setBalance={setBalance} address={address}/>
         </div>
