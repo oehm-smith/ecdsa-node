@@ -27,7 +27,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
 
 
   useEffect(() => {
-    setMessage('')
+    setMessage('');
   }, []);
 
   useEffect(() => {
@@ -36,6 +36,8 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         console.log(`Wallet - user changed to ${loggedInUser}`);
         const userWallets = await getWallets(loggedInUser);
         // New user chosen, so their Wallet Connection must be logged in to
+        setSelectedWallet(null);
+        setBalance(0);
         setLoginModalDisabled(false);
         openWalletConnectModal();
       }
@@ -60,12 +62,12 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
     }
   }
 
-  async function getWallet(user, walletX) {
-    console.log(`getWallet user: ${user}, wallet: ${walletX}`);
+  async function getWallet(user, givenWallet) {
+    console.log(`getWallet user: ${user}, wallet: ${givenWallet}`);
     try {
       const {
         data: { message, wallet },
-      } = await server.get(`users/` + user + '/wallets/' + walletX);
+      } = await server.get(`users/` + user + '/wallets/' + givenWallet);
       console.log(`getWallet user response - message: ${message}, wallet: ${JSON.stringify(wallet)}`);
       setBalance(wallet.balance)
     } catch (ex) {
@@ -111,9 +113,10 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
     setSelectedWallet(theSelectedWallet.value)
-    getWallet(loggedInUser, selectedWallet);
+    getWallet(loggedInUser, theSelectedWallet.value);
   }
 
+  console.log(`selectedWallet: ${selectedWallet}`)
   return (
     <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
       <h1>Your Wallet</h1>
@@ -122,6 +125,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         <Select defaultValue={selectedWallet}
           options={walletsOptions}
           onChange={walletSelected}
+          placeholder="Select wallet..."
         />
       </div>
 
