@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import server from "./server";
+import XMessage from "./XMessage.jsx"
 
-function XMessage({message}) {
-    return (
-        <><p>{message}</p></>
-    )
-}
 function User({ loggedInUser, setLoggedInUser }) {
     const [newUser, setNewUser] = useState("");
     const [message, setMessage] = useState("");
+    const [users, setUsers] = useState([]);
     const setValue = (setter) => (evt) => setter(evt.target.value);
+
+    useEffect(() => {
+        const doIt = async () => {
+            await getUsers();
+        }
+        doIt();
+    }, [])
 
     async function login(evt) {
         evt.preventDefault();
@@ -33,12 +37,30 @@ function User({ loggedInUser, setLoggedInUser }) {
         }
     }
 
+    async function getUsers() {
+        console.log(`getUsers`);
+        try {
+            const {
+                data: { users },
+            } = await server.get(`users`);
+            setUsers(users);
+            console.log(`getUsers response: ${users}`);
+        } catch (ex) {
+            console.log(`getUsers error - ex response: ${JSON.stringify(ex)}`)
+            if (ex.response.status === 401) {
+                setMessage(`User doesnt exist: ${newUser}`);
+            } else {
+                setMessage(ex.message);
+            }
+        }
+    }
+
     async function addNewUser(theNewUser){
         console.log(`addNewUser: ${theNewUser}`)
         try {
             const {
                 data: { message },
-            } = await server.post(`addUser`, {
+            } = await server.post(`users`, {
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
@@ -55,17 +77,17 @@ function User({ loggedInUser, setLoggedInUser }) {
     }
     return (
         <form className="container login">
-            <h1>Login</h1> (Browswer - not part of this app as such)
+            <h1>User</h1> (Browser - not part of this app as such)
 
             <p>Current user: {loggedInUser}</p>
             <label>
-                User
                 <input
-                    placeholder="steve, dan, bill, whomever ..."
+                    placeholder="User"
                     value={newUser}
                     onChange={setValue(setNewUser)}
                 ></input>
             </label>
+            <p>Users: {users.join(', ')}</p>
 
             <button className="button" onClick={() => createNewUser(newUser)}>
                 Create New User
