@@ -21,7 +21,7 @@ Modal.setAppElement('#root');
 function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   const [message, setMessage] = useState("");
   const [wallets, setWallets] = useState([]);
-  const [disabled, setDisabled] = useState(true);
+  const [loginModalDisabled, setLoginModalDisabled] = useState(true);
   const [selectedWallet, setSelectedWallet] = useState('');
   const [walletConnectModalIsOpen, setWalletConnectModalIsOpen] = useState(false);
 
@@ -35,7 +35,9 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
       if (loggedInUser) {
         console.log(`Wallet - user changed to ${loggedInUser}`);
         const userWallets = await getWallets(loggedInUser);
-        setDisabled(false);
+        // New user chosen, so their Wallet Connection must be logged in to
+        setLoginModalDisabled(false);
+        openWalletConnectModal();
       }
     }
     doIt();
@@ -101,21 +103,19 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
 
   function closeModal() {
     setWalletConnectModalIsOpen(false);
-    setDisabled(false);
-    // They have entered the correct wallet connect password (pretend at least!)
-    getWallet(loggedInUser, selectedWallet);
+    setLoginModalDisabled(false);
   }
 
   const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: w}));
 
-  function walletSelected(selectedWallet) {
-    console.log(`walletSeleted: ${JSON.stringify(selectedWallet)}`)
-    setSelectedWallet(selectedWallet.value)
-    openWalletConnectModal();
+  function walletSelected(theSelectedWallet) {
+    console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
+    setSelectedWallet(theSelectedWallet.value)
+    getWallet(loggedInUser, selectedWallet);
   }
 
   return (
-    <div className="container wallet" style={disabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
+    <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
       <h1>Your Wallet</h1>
 
       <div>
