@@ -36,7 +36,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         console.log(`Wallet - user changed to ${loggedInUser}`);
         const userWallets = await getWallets(loggedInUser);
         // New user chosen, so their Wallet Connection must be logged in to
-        setSelectedWallet(null);
+        setSelectedWallet(" ");
         setBalance(0);
         setLoginModalDisabled(false);
         openWalletConnectModal();
@@ -109,11 +109,16 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   }
 
   const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: w}));
+  walletsOptions.push({value: " ", label: " "});
 
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
     setSelectedWallet(theSelectedWallet.value)
     getWallet(loggedInUser, theSelectedWallet.value);
+  }
+
+  function clearWallets() {
+    setSelectedWallet(" "); // I can't work out how to set selectedWallet to "" / null when new user chosen
   }
 
   console.log(`selectedWallet: ${selectedWallet}`)
@@ -125,19 +130,19 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         <Select defaultValue={selectedWallet}
           options={walletsOptions}
           onChange={walletSelected}
-          placeholder="Select wallet..."
         />
       </div>
 
       <div className="balance">Balance: {balance}</div>
       <XMessage message={message}/>
+      <button onClick={clearWallets}>Clear Wallet</button>
 
       <Modal
           isOpen={walletConnectModalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
-          contentLabel="Example Modal"
+          contentLabel="Unlock wallet"
       >
         <h2>Login to Wallet Connection</h2>
         {/*ref={(_subtitle) => (subtitle = _subtitle)}*/}
