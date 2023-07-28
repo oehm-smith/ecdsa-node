@@ -44,10 +44,22 @@ app.post("/send", (req, res) => {
 
 // -----------------------------------------------------------------
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}!`);
-});
+function main() {
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}!`);
+  });
 
+  (() => {
+    console.log(`Routes:`)
+    app._router.stack.forEach(function (r) {
+      if (r.route && r.route.path) {
+        console.log(`    ` + Object.keys(r.route.methods)[0].toUpperCase() + " " + r.route.path)
+      }
+    })
+  })();
+}
+
+main();
 function setInitialBalance(address) {
   if (!balances[address]) {
     balances[address] = 0;

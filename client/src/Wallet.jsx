@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import XMessage from "./XMessage.jsx"
 import Modal from 'react-modal';
 import Select from "react-select"
+import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
 
 const customStyles = {
   content: {
@@ -31,19 +32,20 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   }, []);
 
   useEffect(() => {
-    const doIt = async () => {
-      if (loggedInUser) {
-        console.log(`Wallet - user changed to ${loggedInUser}`);
-        const userWallets = await getWallets(loggedInUser);
-        // New user chosen, so their Wallet Connection must be logged in to
-        setSelectedWallet(" ");
-        setBalance(0);
-        setLoginModalDisabled(false);
-        openWalletConnectModal();
-      }
-    }
-    doIt();
+    console.log(`Wallet - user changed to ${loggedInUser}`);
+    loadUserWallets();
+    // New user chosen, so their Wallet Connection must be logged in to
+    setSelectedWallet(" ");
+    setBalance(0);
+    setLoginModalDisabled(false);
+    openWalletConnectModal();
   }, [loggedInUser]); // Only re-run the effect if count changes
+
+  async function loadUserWallets(){
+    if (loggedInUser) {
+      const userWallets = await getWallets(loggedInUser);
+    }
+  }
 
   async function getWallets(user) {
     try {
@@ -108,8 +110,15 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
     setLoginModalDisabled(false);
   }
 
-  const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: w}));
-  walletsOptions.push({value: " ", label: " "});
+  const prepareAddress = (publicKey) => {
+    if (publicKey.length > 16) {
+      return "0x" + publicKey.slice(0, 6) + "..." + publicKey.slice(-6);
+    }
+    return publicKey;
+  }
+
+  const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: prepareAddress(w)}));
+  // walletsOptions.push({value: " ", label: " "});
 
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
@@ -119,6 +128,30 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
 
   function clearWallets() {
     setSelectedWallet(" "); // I can't work out how to set selectedWallet to "" / null when new user chosen
+  }
+
+  async function newWallet() {
+    const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
+
+    async function createWallet() {
+      try {
+        const {
+          data: { message },
+        } = await server.post(`users/` + loggedInUser + '/wallets/' + publicKey, {
+          balance: 0,
+        });
+        console.log(`createWallet - message: ${message}`)
+        loadUserWallets();
+      } catch (ex) {
+        if (ex.response) {
+          alert(ex.response.data.message);
+        } else {
+          alert(ex);
+        }
+      }
+    }
+
+    return createWallet();
   }
 
   console.log(`selectedWallet: ${selectedWallet}`)
@@ -135,7 +168,8 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
 
       <div className="balance">Balance: {balance}</div>
       <XMessage message={message}/>
-      <button onClick={clearWallets}>Clear Wallet</button>
+      {/*<button onClick={clearWallets}>Clear Wallet</button>*/}
+      <button onClick={newWallet}>New Wallet</button>
 
       <Modal
           isOpen={walletConnectModalIsOpen}

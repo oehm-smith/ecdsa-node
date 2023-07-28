@@ -1,3 +1,5 @@
+const Cryptography = require('./Cryptography')
+
 class UserWallets {
     userWallets = {}; // Users to multiple wallets
 
@@ -6,11 +8,10 @@ class UserWallets {
     }
 
     setupDummyData() {
-        ['tom', 'dan'].forEach(u => {
-            this.addUser(u);
-            ['0x1' + u, '0x2' + u].forEach(w => {
-                this.updateUserWallet(u, w, Math.round(Math.random() * 100))
-            })
+        ['tom', 'dan'].forEach(user => {
+            const publicKey = Cryptography.createNewPublicPrivateKey();
+
+            this.createUpdateUserWallet(user, publicKey, Math.round(Math.random() * 1000))
         })
     }
 
@@ -31,20 +32,23 @@ class UserWallets {
 
     /**
      * @param user
-     * @param wallet
-     * @param amount
+     * @param publicKey
+     * @param balance
      * @return boolean - if user existed
      */
-    updateUserWallet(user, wallet, amount = 0) {
-        if (!(user && wallet) ) {
+    createUpdateUserWallet(user, publicKey, balance = 0) {
+        let userAlreadyExisted = false;
+        if (!(user && publicKey) ) {
             throw Error("Must have user and wallet args");
         }
 
         if (!this.userWallets.hasOwnProperty(user)) {
-            return false;
+            this.addUser(user);
+        } else {
+            userAlreadyExisted = true;
         }
-        this.userWallets[user][wallet] = {balance: amount};
-        return true;
+        this.userWallets[user][publicKey] = {balance: balance};
+        return userAlreadyExisted;
     }
 
     /**
