@@ -23,6 +23,23 @@ module.exports=function(app) {
         res.send({ users })
     });
 
+    app.post("/users/login", (req, res) => {
+        const { user } = req.body;
+        console.log(`login user: ${user}`);
+
+        let message = `login user ${user}, userData: `;
+        const userData = userWallets.getUser(user);
+        if (userData === null) {
+            message = `user doesn't exist: ${user}`;
+            // res.status(401).json({message})
+            res.status(401).send({ data: message })
+        } else {
+            message += userData;
+            res.send({ message })
+        }
+        console.log(`all users: ${userWallets.getUsers()}`);
+    })
+
     app.get("/users/:user", (req, res) => {
         const { user } = req.params;
         const wallets = userWallets.getUser(user);
@@ -50,21 +67,4 @@ module.exports=function(app) {
             res.send({ message: "all good", wallet: userWallet })
         }
     });
-
-    app.post("/login", (req, res) => {
-        const { user } = req.body;
-        console.log(`login user: ${user}`);
-
-        let message = `login user ${user}, userData: `;
-        const userData = userWallets.getUser(user);
-        if (userData === null) {
-            message = `user doesn't exist: ${user}`;
-            // res.status(401).json({message})
-            res.status(401).send({ data: message })
-        } else {
-            message += userData;
-            res.send({ message })
-        }
-        console.log(`all users: ${userWallets.getUsers()}`);
-    })
 }

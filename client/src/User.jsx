@@ -22,7 +22,7 @@ function User({ loggedInUser, setLoggedInUser }) {
         try {
             const {
                 data: { message },
-            } = await server.post(`login`, {
+            } = await server.post(`/users/login`, {
                 user: newUser,
             });
             setLoggedInUser(newUser);
