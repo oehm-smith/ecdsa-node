@@ -1,8 +1,8 @@
 module.exports=function(app) {
 
-    const UserWallets = require("./UserWallets")
+    const Users = require("./UserWallets").Users;
 
-    const userWallets = new UserWallets();
+    const userWallets = new Users();
 
     // Add new user
     app.post("/users", (req, res) => {
@@ -42,6 +42,21 @@ module.exports=function(app) {
         }
         console.log(`all users: ${userWallets.getUsers()}`);
     })
+
+    app.get("/users/walletAddresses", (req, res) => {
+        console.log(`/users/wallets`)
+        // res.send({ message: "all good", wallets: null}) //allWallets })
+        //
+        const allWallets = userWallets.getAllWalletAddressess();
+        console.log(`allWallets: ${JSON.stringify(allWallets)}`);
+        if (!allWallets) {
+            message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
+            // res.status(401).json({message})
+            res.status(400).send({ data: message, wallets: null })
+        } else {
+            res.send({ message: "all good", wallets: allWallets })
+        }
+    });
 
     // Get specific user
     app.get("/users/:user", (req, res) => {

@@ -27,7 +27,11 @@ function App() {
                 setAddress={setAddress}
                 loggedInUser={loggedInUser}
             />
-            <Transfer setBalance={setBalance} address={address}/>
+            <Transfer
+                setBalance={setBalance}
+                address={address}
+                loggedInUser={loggedInUser}
+            />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import XMessage from "./XMessage.jsx"
 import Modal from 'react-modal';
 import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
+import { prepareAddress } from "./Utils.js"
 
 const customStyles = {
   content: {
@@ -80,7 +81,6 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         setMessage(ex.message);
       }
     }
-
   }
 
   async function onChange(evt) {
@@ -108,13 +108,6 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   function closeModal() {
     setWalletConnectModalIsOpen(false);
     setLoginModalDisabled(false);
-  }
-
-  const prepareAddress = (publicKey) => {
-    if (publicKey.length > 16) {
-      return "0x" + publicKey.slice(0, 6) + "..." + publicKey.slice(-6);
-    }
-    return publicKey;
   }
 
   const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: prepareAddress(w)}));
@@ -157,7 +150,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   console.log(`selectedWallet: ${selectedWallet}`)
   return (
     <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
-      <h1>Your Wallet</h1>
+      <h1>Your Wallets</h1>
 
       <div>
         <Select defaultValue={selectedWallet}
