@@ -42,7 +42,7 @@ function User({ loggedInUser, setLoggedInUser }) {
         try {
             const {
                 data: { users },
-            } = await server.get(`users`);
+            } = await server.get(`/users`);
             setUsers(users);
             console.log(`getUsers response: ${users}`);
         } catch (ex) {

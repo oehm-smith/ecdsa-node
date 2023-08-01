@@ -20,7 +20,7 @@ module.exports=function(app) {
     })
 
     // Get users
-    app.get("/users", (req, res) => {
+    app.get("/users/?$", (req, res) => {
         const users = userWallets.getUsers();
         res.send({ users })
     });
@@ -61,13 +61,14 @@ module.exports=function(app) {
     // Get specific user
     app.get("/users/:user", (req, res) => {
         const { user } = req.params;
-        const wallets = userWallets.getUser(user);
+        const walletsMap = userWallets.getUser(user);
 
-        if (!wallets) {
+        if (!walletsMap) {
             message = `user doesn't exist (no wallets): ${user}`;
             // res.status(401).json({message})
             res.status(400).send({ data: message })
         } else {
+            const wallets = Object.fromEntries(walletsMap);
             res.send({ message: "all good", wallets })
         }
     });
@@ -76,14 +77,14 @@ module.exports=function(app) {
     app.get("/users/:user/wallets/:publicKey", (req, res) => {
         const { user } = req.params;
         const { publicKey } = req.params;
-        const userWallet = userWallets.getUserWallet(user, publicKey);
+        const wallet = userWallets.getUserWallet(user, publicKey);
 
-        if (!userWallet) {
+        if (!wallet) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
             // res.status(401).json({message})
             res.status(400).send({ data: message })
         } else {
-            res.send({ message: "all good", wallet: userWallet })
+            res.send({ message: "all good", wallet })
         }
     });
 
@@ -96,7 +97,8 @@ module.exports=function(app) {
         let message;
 
         try {
-            const userAlreadyExisted = userWallets.createUpdateUserWallet(user, publicKey, balance)
+            const userAlreadyExisted = userWallets.createUpdateUserWallet(user, publicKey, balance);
+
 
             message = `User existed - added new public key: ${user}, ${publicKey}`;
             if (!userAlreadyExisted) {
