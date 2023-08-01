@@ -26,6 +26,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser, transf
   const [loginModalDisabled, setLoginModalDisabled] = useState(true);
   const [selectedWallet, setSelectedWallet] = useState('');
   const [walletConnectModalIsOpen, setWalletConnectModalIsOpen] = useState(false);
+  const [hasWalletConnectModalBeenOpenForUser, setHasWalletConnectModalBeenOpenForUser] = useState(false);
 
 
   useEffect(() => {
@@ -35,11 +36,11 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser, transf
   useEffect(() => {
     console.log(`Wallet - user changed to ${loggedInUser}`);
     loadUserWallets();
-    // New user chosen, so their Wallet Connection must be logged in to
+    // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
+    setHasWalletConnectModalBeenOpenForUser(false);
     setSelectedWallet(" ");
     setBalance(0);
     setLoginModalDisabled(false);
-    openWalletConnectModal();
   }, [loggedInUser]); // Only re-run the effect if count changes
 
   async function loadUserWallets(){
@@ -115,6 +116,10 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser, transf
 
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
+    if (! hasWalletConnectModalBeenOpenForUser) {
+      setWalletConnectModalIsOpen(true);
+      setHasWalletConnectModalBeenOpenForUser(true);
+    }
     setSelectedWallet(theSelectedWallet.value)
     // DUPE ???????
     setAddress(theSelectedWallet.value);
