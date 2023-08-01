@@ -4,19 +4,20 @@ import Select from "react-select"
 import XMessage from "./XMessage.jsx"
 import { prepareAddress } from "./Utils.js"
 
-function Transfer({ address, setBalance, loggedInUser }) {
+function Transfer({ address, setBalance, loggedInUser, transferDialogDisabled }) {
   const [message, setMessage] = useState("");
   const [sendAmount, setSendAmount] = useState("");
   // const [recipient, setRecipient] = useState("");
   const [allWallets, setAllWallets] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState('');
+  const [walletPaneDisabled, setWalletPaneDisabled] = useState(true);
 
   useEffect( () => {
     async function doIt(){
       await getAllWallets();
     }
     doIt();
-  }, [])
+  }, [address])
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
@@ -42,8 +43,8 @@ function Transfer({ address, setBalance, loggedInUser }) {
       const {
         data: { message, wallets },
       } = await server.get(`users/walletAddresses`);
-      console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}`);
-      setAllWallets(wallets);
+      console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
+      setAllWallets(wallets.filter(w => w !== address));
     } catch (ex) {
       console.log(`getAllWallets error response: ${JSON.stringify(ex)}`)
       return null;
@@ -56,7 +57,7 @@ function Transfer({ address, setBalance, loggedInUser }) {
   }
 
   const allWalletsOptions = allWallets.map(w => ({value: w, label: prepareAddress(w)}));
-  console.log(`allWalletsOptions: ${JSON.stringify(allWalletsOptions)}`)
+  // console.log(`allWalletsOptions: ${JSON.stringify(allWalletsOptions)}`)
 
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
@@ -65,7 +66,7 @@ function Transfer({ address, setBalance, loggedInUser }) {
   }
 
   return (
-    <form className="container transfer" onSubmit={transfer}>
+    <form className="container transfer" onSubmit={transfer} style={transferDialogDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
       <h1>Send Transaction</h1>
 
       <label>

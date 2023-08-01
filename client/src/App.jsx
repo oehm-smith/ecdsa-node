@@ -9,6 +9,7 @@ function App() {
     const [address, setAddress] = useState("");
     const [loggedInUser, setLoggedInUser] = useState("");
     const [connectedWallet, setConnectedWallet] = useState("");
+    const [transferDialogDisabled, setTransferDialogDisabled] = useState(true);
 
     return (
         <div className="app">
@@ -26,11 +27,14 @@ function App() {
                 address={address}
                 setAddress={setAddress}
                 loggedInUser={loggedInUser}
+                transferDialogDisabled={transferDialogDisabled}
+                setTransferDialogDisabled={setTransferDialogDisabled}
             />
             <Transfer
                 setBalance={setBalance}
                 address={address}
                 loggedInUser={loggedInUser}
+                transferDialogDisabled={transferDialogDisabled}
             />
         </div>
     );
