@@ -31,10 +31,12 @@ function App() {
                 setTransferDialogDisabled={setTransferDialogDisabled}
             />
             <Transfer
+                balance={balance}
                 setBalance={setBalance}
                 address={address}
                 loggedInUser={loggedInUser}
                 transferDialogDisabled={transferDialogDisabled}
+                setTransferDialogDisabled={setTransferDialogDisabled}
             />
         </div>
     );

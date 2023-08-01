@@ -4,7 +4,7 @@ import Select from "react-select"
 import XMessage from "./XMessage.jsx"
 import { prepareAddress } from "./Utils.js"
 
-function Transfer({ address, setBalance, loggedInUser, transferDialogDisabled }) {
+function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled }) {
   const [message, setMessage] = useState("");
   const [sendAmount, setSendAmount] = useState("");
   // const [recipient, setRecipient] = useState("");
@@ -18,6 +18,12 @@ function Transfer({ address, setBalance, loggedInUser, transferDialogDisabled })
     }
     doIt();
   }, [address])
+
+  useEffect(() => {
+    if (balance == 0) {
+      setTransferDialogDisabled(true);
+    }
+  }, [balance])
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
