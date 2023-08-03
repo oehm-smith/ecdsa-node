@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import log from 'loglevel';
 import server from "./server";
 import XMessage from "./XMessage.jsx"
+import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
+import { createWallet } from "./wallets.js"
 
 function User({ loggedInUser, setLoggedInUser }) {
     const [newUser, setNewUser] = useState("");
@@ -66,7 +68,7 @@ function User({ loggedInUser, setLoggedInUser }) {
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
-            log.debug(`addNewUser response: ${message}`);
+            log.debug(`addNewUser: ${theNewUser} - response: ${message}`);
         } catch (ex) {
             log.error(ex.message);//.data.message);
             setMessage(ex.message);
@@ -77,9 +79,43 @@ function User({ loggedInUser, setLoggedInUser }) {
         log.debug(`createNewUser: ${newUser}`)
         addNewUser(newUser);
     }
+
+    async function setupDummyUsers(evt) {
+        console.log(`setupDummyUsers - evt: ${evt}`)
+        evt.preventDefault();
+        const dummyUsers = ['tom', 'dan'];
+        if (users.filter(u => dummyUsers.indexOf(u) > -1).length == dummyUsers.length) {
+            log.error(`setupDummyUsers - already have dummy users`);
+            setMessage(`setupDummyUsers - already have dummy users`);
+        } else {
+            log.debug(`Add dummy users before for: ${JSON.stringify(dummyUsers)}`)
+            for (const dummyUser of dummyUsers) {
+                log.debug(`Add dummy user before test: ${dummyUser}`)
+                if (users.indexOf(dummyUser) == -1) {
+                    log.debug(`Add dummy user after test: ${dummyUser}`)
+                    const doIt = async () => {
+                        const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
+
+                        log.debug(`Add dummy user: ${dummyUser}`)
+                        await addNewUser(dummyUser)
+                        await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
+                    };
+                    await doIt();
+                } else {
+                    log.info(`User already added: ${dummyUser}`)
+                }
+            }
+            await getUsers();
+        }
+    }
+
+    const headerMessageStyle = {
+        fontSize: "0.5em",
+    }
     return (
         <form className="container login">
-            <h1>User</h1> (Browser - not part of this app as such)
+            <h1>User <span style={ headerMessageStyle }>(Browser - not part of this app as such)</span></h1>
+            <button className="button" onClick={setupDummyUsers}>Create dummy users</button>
 
             <p>Current user: {loggedInUser}</p>
             <label>

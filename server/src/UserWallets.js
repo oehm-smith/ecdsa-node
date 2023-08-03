@@ -1,4 +1,5 @@
 const Cryptography = require('./Cryptography')
+const Logger = require('./Logger')
 
 /**
  * Class for Users and their Wallets.  Exploded out in to 3 classes to make expanding the wallet fields easier.
@@ -32,18 +33,12 @@ class UserWallets {
 }
 
 class Users {
+
+
     users = new Map(); // Map of Users to UserWallets
 
     constructor() {
-        this.setupDummyData();
-    }
-
-    setupDummyData() {
-        ['tom', 'dan'].forEach(user => {
-            const publicKey = Cryptography.createNewPublicPrivateKey();
-
-            this.createUpdateUserWallet(user, publicKey, Math.round(Math.random() * 1000))
-        })
+        this.logger = Logger();
     }
 
     clear() {

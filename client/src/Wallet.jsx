@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
 import { prepareAddress } from "./Utils.js"
+import { createWallet } from "./wallets.js"
 
 const customStyles = {
   content: {
@@ -46,6 +47,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser, transf
   async function loadUserWallets(){
     if (loggedInUser) {
       const userWallets = await getWallets(loggedInUser);
+      console.log(`userWallets: ${JSON.stringify(userWallets)}`)
     }
   }
 
@@ -134,25 +136,7 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser, transf
   async function newWallet() {
     const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-    async function createWallet() {
-      try {
-        const {
-          data: { message },
-        } = await server.post(`users/` + loggedInUser + '/wallets/' + publicKey, {
-          balance: 0,
-        });
-        console.log(`createWallet - message: ${message}`)
-        loadUserWallets();
-      } catch (ex) {
-        if (ex.response) {
-          alert(ex.response.data.message);
-        } else {
-          alert(ex);
-        }
-      }
-    }
-
-    return createWallet();
+    return createWallet(loggedInUser, publicKey);
   }
 
   console.log(`selectedWallet: ${selectedWallet}`)
