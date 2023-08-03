@@ -92,6 +92,8 @@ class Users {
             throw new Error(`Wallet addresses must be unique - ${publicKey} already used.`)
         }
         userWallets.set(publicKey, {balance})
+        this.logger.info(`CreateUpdateUserWallet: ${user} with publicKey: ${publicKey}, balance: ${balance}`)
+
         return userAlreadyExisted;
     }
 
@@ -103,6 +105,7 @@ class Users {
         if (this.users.has(user)) {
             throw new Error(`Attempting to add existing user: ${user}`)
         }
+        this.logger.info(`Add user: ${user}`)
         this.users.set(user, new Map());
     }
 
