@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import log from 'loglevel';
 import server from "./server";
 import XMessage from "./XMessage.jsx"
 
@@ -7,6 +8,8 @@ function User({ loggedInUser, setLoggedInUser }) {
     const [message, setMessage] = useState("");
     const [users, setUsers] = useState([]);
     const setValue = (setter) => (evt) => setter(evt.target.value);
+
+    log.enableAll();
 
     useEffect(() => {
         const doIt = async () => {
@@ -18,7 +21,7 @@ function User({ loggedInUser, setLoggedInUser }) {
     async function login(evt) {
         evt.preventDefault();
 
-        console.log(`doLogin: ${newUser}`)
+        log.debug(`doLogin: ${newUser}`)
         try {
             const {
                 data: { message },
@@ -26,7 +29,7 @@ function User({ loggedInUser, setLoggedInUser }) {
                 user: newUser,
             });
             setLoggedInUser(newUser);
-            console.log(`doLogin response: ${message}`);
+            log.debug(`doLogin response: ${message}`);
         } catch (ex) {
             console.log(`ex response: ${JSON.stringify(ex)}`)
             if (ex.response.status === 401) {
@@ -38,15 +41,14 @@ function User({ loggedInUser, setLoggedInUser }) {
     }
 
     async function getUsers() {
-        console.log(`getUsers`);
         try {
             const {
                 data: { users },
             } = await server.get(`/users`);
             setUsers(users);
-            console.log(`getUsers response: ${users}`);
+            log.debug(`getUsers: ${JSON.stringify(users)}`);
         } catch (ex) {
-            console.log(`getUsers error - ex response: ${JSON.stringify(ex)}`)
+            log.debug(`getUsers error - ex response: ${JSON.stringify(ex)}`)
             if (ex.response.status === 401) {
                 setMessage(`User doesnt exist: ${newUser}`);
             } else {
@@ -56,7 +58,7 @@ function User({ loggedInUser, setLoggedInUser }) {
     }
 
     async function addNewUser(theNewUser){
-        console.log(`addNewUser: ${theNewUser}`)
+        log.debug(`addNewUser: ${theNewUser}`)
         try {
             const {
                 data: { message },
@@ -64,15 +66,15 @@ function User({ loggedInUser, setLoggedInUser }) {
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
-            console.log(`addNewUser response: ${message}`);
+            log.debug(`addNewUser response: ${message}`);
         } catch (ex) {
-            console.log(ex.message);//.data.message);
+            log.error(ex.message);//.data.message);
             setMessage(ex.message);
         }
     }
 
     async function createNewUser(evt) {
-        console.log(`createNewUser: ${newUser}`)
+        log.debug(`createNewUser: ${newUser}`)
         addNewUser(newUser);
     }
     return (
