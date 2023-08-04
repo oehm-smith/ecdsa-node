@@ -80,33 +80,28 @@ function User({ loggedInUser, setLoggedInUser }) {
         addNewUser(newUser);
     }
 
+    async function clearUsers() {
+        const response = await server.delete("users")
+        await getUsers();
+    }
+
     async function setupDummyUsers(evt) {
         console.log(`setupDummyUsers - evt: ${evt}`)
         evt.preventDefault();
         const dummyUsers = ['tom', 'dan'];
-        if (users.filter(u => dummyUsers.indexOf(u) > -1).length == dummyUsers.length) {
-            log.error(`setupDummyUsers - already have dummy users`);
-            setMessage(`setupDummyUsers - already have dummy users`);
-        } else {
-            log.debug(`Add dummy users before for: ${JSON.stringify(dummyUsers)}`)
-            for (const dummyUser of dummyUsers) {
-                log.debug(`Add dummy user before test: ${dummyUser}`)
-                if (users.indexOf(dummyUser) == -1) {
-                    log.debug(`Add dummy user after test: ${dummyUser}`)
-                    const doIt = async () => {
-                        const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
+        await clearUsers();
+        // log.debug(`Add dummy users before for: ${JSON.stringify(dummyUsers)}`)
+        for (const dummyUser of dummyUsers) {
+            const doIt = async () => {
+                const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-                        log.debug(`Add dummy user: ${dummyUser}`)
-                        await addNewUser(dummyUser)
-                        await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
-                    };
-                    await doIt();
-                } else {
-                    log.info(`User already added: ${dummyUser}`)
-                }
-            }
-            await getUsers();
+                log.debug(`Add dummy user: ${dummyUser}`)
+                await addNewUser(dummyUser)
+                await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
+            };
+            await doIt();
         }
+        await getUsers();
     }
 
     const headerMessageStyle = {
