@@ -1,5 +1,9 @@
 const Logger = require("./Logger")
 const { StatusCodes } = require("http-status-codes")
+const { unserialize } = require("./Utils")
+const { hexToBytes, bytesToUtf8 } = require("ethereum-cryptography/utils")
+const JSONbig = require('json-bigint');
+
 module.exports=function(app) {
     const Logger = require('./Logger')
     const StatusCodes = require('http-status-codes').StatusCodes;
@@ -110,4 +114,40 @@ module.exports=function(app) {
             res.status(500).send({message : ex})
         }
     });
+
+    app.post("/users/:user/wallets/:publicKey/transfer", (req, res) => {
+        const { transferData, signature } = req.body;
+        const { publicKey } = req.params;
+        // const s = new SignatureType();
+        if (publicKey != transferData.from) {
+            throw new Error(`Transfer - public key in action is not same as in parameter`)
+        }
+
+        let message;
+
+        try {
+            // let signatureP = unserialize(signature, RecoveredSignatureType);
+            // let signatureP = JSONbig.parse(signature); //bytesToUtf8(signature);
+            userWallets.transfer(transferData, signature);
+            //
+            //
+            // message = `User existed - added new public key: ${user}, ${publicKey}`;
+            // if (!userAlreadyExisted) {
+            //     message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
+            // }
+            res.send({ transferData })
+        } catch (ex) {
+            console.error(ex);
+            res.status(500).send({message : ex})
+        }
+    });
+
+    app.delete("/users", (req, res) => {
+        try {
+            userWallets.clear();
+            res.status(StatusCodes.OK).send();
+        } catch (ex) {
+            res.status(500).send({message : ex})
+        }
+    })
 }

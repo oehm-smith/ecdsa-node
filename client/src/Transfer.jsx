@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
+import log from 'loglevel';
 import server from "./server";
 import Select from "react-select"
 import XMessage from "./XMessage.jsx"
-import { prepareAddress } from "./Utils.js"
+import { JSONStringify, prepareAddress } from "./Utils.js"
+import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
+import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
+import JSONbig from "json-bigint"
 
 function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled }) {
   const [message, setMessage] = useState("");
@@ -30,17 +34,27 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
   async function transfer(evt) {
     evt.preventDefault();
 
+    const {  message, transferData, signature } = WalletConnectSecureBrowserPlugin.signMessage(address, selectedWallet, sendAmount);
+    if (message) {
+      setMessage(JSON.stringify(message));
+    }
+    log.info(JSON.stringify(message))
+    log.debug(`transferSignature: ${JSONStringify(signature)}`)
+    // const ts = typeof signature;
+    // const signature2 = utf8ToBytes(signature);
+    const signature2 = JSONbig.stringify(signature);
     try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
+      const url = `users/${loggedInUser}/wallets/${address}/transfer`;
+      console.log(`post to ${url}`)
+      const response = await server.post(url, {
+        transferData,
+        signature:signature2
       });
-      setBalance(balance);
+      console.log(`status: ${response.status}`)
+      // return transferData;
+      // setBalance(balance);
     } catch (ex) {
-      alert(ex.response.data.message);
+      log.error(ex);
     }
   }
 
@@ -49,10 +63,10 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
       const {
         data: { message, wallets },
       } = await server.get(`users/walletAddresses`);
-      console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
+      // console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
       setAllWallets(wallets.filter(w => w !== address));
     } catch (ex) {
-      console.log(`getAllWallets error response: ${JSON.stringify(ex)}`)
+      log.error(`getAllWallets error response: ${ex}`)
       return null;
       // if (ex.response.status === 400) {
       //   setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
@@ -66,7 +80,7 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
   // console.log(`allWalletsOptions: ${JSON.stringify(allWalletsOptions)}`)
 
   function walletSelected(theSelectedWallet) {
-    console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
+    // console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
     setSelectedWallet(theSelectedWallet.value)
     // getWallet(loggedInUser, theSelectedWallet.value);
   }

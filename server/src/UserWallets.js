@@ -1,6 +1,8 @@
 const Cryptography = require('./Cryptography')
 const Logger = require('./Logger')
 
+// TODO - I'm only using one of these classes!
+
 /**
  * Class for Users and their Wallets.  Exploded out in to 3 classes to make expanding the wallet fields easier.
  */
@@ -33,8 +35,6 @@ class UserWallets {
 }
 
 class Users {
-
-
     users = new Map(); // Map of Users to UserWallets
 
     constructor() {
@@ -42,7 +42,9 @@ class Users {
     }
 
     clear() {
+        this.logger.debug(`clear users - currently contains: ${this.users.size}`)
         this.users.clear();
+        this.logger.debug(`clear users - now contains: ${this.users.size}`)
     }
 
     /**
@@ -150,6 +152,21 @@ class Users {
             allWalletAddresses.push(...Array.from(userValue.keys()));
         });
         return allWalletAddresses;
+    }
+
+    /**
+     *
+     * @param action - from (public key), to (public key), operation (it will be 'transfer') and amount
+     * @param signature - signed using private key associated with from
+     */
+    transfer(action, signature) {
+        const {  from, to, amount } = action;
+        // verify the signature is from the action
+        const isValid = Cryptography.verify(signature, action, from);
+        this.logger.info(`message is valid: ${isValid}`)
+        // const a = new RecoveredSignatureType();
+        // execute the action
+        return isValid;
     }
 }
 
