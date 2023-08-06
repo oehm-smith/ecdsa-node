@@ -2,7 +2,7 @@ const Logger = require("./Logger")
 const { StatusCodes } = require("http-status-codes")
 const { unserialize } = require("./Utils")
 const { hexToBytes, bytesToUtf8 } = require("ethereum-cryptography/utils")
-const JSONbig = require('json-bigint');
+const JSONbig = require('json-bigint')({ useNativeBigInt: true });
 
 module.exports=function(app) {
     const Logger = require('./Logger')
@@ -127,8 +127,8 @@ module.exports=function(app) {
 
         try {
             // let signatureP = unserialize(signature, RecoveredSignatureType);
-            // let signatureP = JSONbig.parse(signature); //bytesToUtf8(signature);
-            userWallets.transfer(transferData, signature);
+            let signatureObj = JSONbig.parse(signature); //bytesToUtf8(signature);
+            userWallets.transfer(transferData, signatureObj);
             //
             //
             // message = `User existed - added new public key: ${user}, ${publicKey}`;

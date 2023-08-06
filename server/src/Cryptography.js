@@ -49,8 +49,8 @@ class Cryptography {
         const messageHash = this._hashMessage(message);
 
         // Signature is json and need to reconstruct a signature that has two fields - r and s and they are both bigints
-        const signatureFixed = unserialize(signature, Signature);
-        return secp256k1.verify(signature, messageHash, publicKey);
+        const signatureFixed = new Signature(signature);
+        return secp256k1.verify(signatureFixed, messageHash, publicKey);
     }
 }
 

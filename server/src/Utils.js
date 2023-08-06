@@ -30,19 +30,12 @@ const unserialize = (str, theClass) => {
 }
 
 class Signature {
-    r;
-    s;
-    recovery;
-    // assertValidity();
-    // addRecoveryBit(recovery);
-    // hasHighS();
-    // normalizeS();
-    // recoverPublicKey(msgHash);
-    // toCompactRawBytes();
-    // toCompactHex();
-    // // DER-encoded
-    // toDERRawBytes(isCompressed);
-    // toDERHex(isCompressed);
+    constructor({r, s, recovery}) {
+        // const {r, s, recovery} = SigLikeObj;
+        this.r = BigInt(r);
+        this.s = BigInt(s);
+        this.recovery = recovery;
+    }
 }
 
 const fixSignatureJSON = (signature) => {

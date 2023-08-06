@@ -154,6 +154,10 @@ class Users {
         return allWalletAddresses;
     }
 
+    getWallet(address) {
+
+    }
+
     /**
      *
      * @param action - from (public key), to (public key), operation (it will be 'transfer') and amount
@@ -163,10 +167,15 @@ class Users {
         const {  from, to, amount } = action;
         // verify the signature is from the action
         const isValid = Cryptography.verify(signature, action, from);
-        this.logger.info(`message is valid: ${isValid}`)
-        // const a = new RecoveredSignatureType();
-        // execute the action
-        return isValid;
+        if (isValid) {
+            this.logger.info(`message is valid: ${isValid}`)
+            // execute the action
+            const fromWallet = this.getWallet(from);
+            const toWallet = this.getWallet(to);
+            return isValid;
+        } else {
+            throw new Error("Cannot transfer between wallets - actions are not valid wrt Signature")
+        }
     }
 }
 
