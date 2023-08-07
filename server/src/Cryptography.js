@@ -49,7 +49,7 @@ class Cryptography {
         const messageHash = this._hashMessage(message);
 
         // Signature is json and need to reconstruct a signature that has two fields - r and s and they are both bigints
-        const signatureFixed = new Signature(signature);
+        const signatureFixed = {r: signature.r, s: signature.s, recovery: signature.recovery};  //new Signature(signature);
         return secp256k1.verify(signatureFixed, messageHash, publicKey);
     }
 }

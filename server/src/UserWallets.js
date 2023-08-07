@@ -43,6 +43,7 @@ class Users {
 
     clear() {
         this.logger.debug(`clear users - currently contains: ${this.users.size}`)
+
         this.users.clear();
         this.logger.debug(`clear users - now contains: ${this.users.size}`)
     }
@@ -129,7 +130,7 @@ class Users {
     }
 
     /**
-     * @return Map of wallets
+     * @return Map of wallets - its a copy, however the wallets in it are the original ones
      */
     getAllWallets() {
         let allWallets =  {};
@@ -154,8 +155,18 @@ class Users {
         return allWalletAddresses;
     }
 
-    getWallet(address) {
-
+    /**
+     *
+     * @param publicKey
+     * @return wallet - {balance: X}
+     * @exception Error if wallet doesnt exist
+     */
+    getWallet(publicKey) {
+        const allWallets = this.getAllWallets();
+        if (! allWallets.has(publicKey)) {
+            throw new Error(`No wallet with given publickey exists: ${publicKey}`)
+        }
+        return allWallets.get(publicKey);
     }
 
     /**
@@ -170,8 +181,12 @@ class Users {
         if (isValid) {
             this.logger.info(`message is valid: ${isValid}`)
             // execute the action
+            const amountNbr = parseInt(amount, 10);
             const fromWallet = this.getWallet(from);
             const toWallet = this.getWallet(to);
+            fromWallet.balance -= amountNbr;
+            toWallet.balance += amountNbr;
+
             return isValid;
         } else {
             throw new Error("Cannot transfer between wallets - actions are not valid wrt Signature")
