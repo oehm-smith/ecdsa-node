@@ -33,26 +33,21 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
 
   async function transfer(evt) {
     evt.preventDefault();
-
-    const {  message, transferData, signature } = WalletConnectSecureBrowserPlugin.signMessage(address, selectedWallet, sendAmount);
+    const action = {operation: "transfer", from: address, to: selectedWallet, amount: sendAmount}
+    const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, address);  // todo change address to publicKey
     if (message) {
       setMessage(JSON.stringify(message));
     }
     log.info(JSON.stringify(message))
     log.debug(`transferSignature: ${JSONStringify(signature)}`)
-    // const ts = typeof signature;
-    // const signature2 = utf8ToBytes(signature);
     const signature2 = JSONbig.stringify(signature);
     try {
       const url = `users/${loggedInUser}/wallets/${address}/transfer`;
-      console.log(`post to ${url}`)
       const response = await server.post(url, {
-        transferData,
+        action,
         signature:signature2
       });
       console.log(`status: ${response.status}`)
-      // return transferData;
-      // setBalance(balance);
     } catch (ex) {
       log.error(ex);
     }

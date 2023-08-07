@@ -116,10 +116,10 @@ module.exports=function(app) {
     });
 
     app.post("/users/:user/wallets/:publicKey/transfer", (req, res) => {
-        const { transferData, signature } = req.body;
+        const { action, signature } = req.body;
         const { publicKey } = req.params;
         // const s = new SignatureType();
-        if (publicKey != transferData.from) {
+        if (publicKey != action.from) {
             throw new Error(`Transfer - public key in action is not same as in parameter`)
         }
 
@@ -128,14 +128,14 @@ module.exports=function(app) {
         try {
             // let signatureP = unserialize(signature, RecoveredSignatureType);
             let signatureObj = JSONbig.parse(signature); //bytesToUtf8(signature);
-            userWallets.transfer(transferData, signatureObj);
+            userWallets.transfer(action, signatureObj);
             //
             //
             // message = `User existed - added new public key: ${user}, ${publicKey}`;
             // if (!userAlreadyExisted) {
             //     message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
             // }
-            res.send({ transferData })
+            res.send({ action })
         } catch (ex) {
             console.error(ex);
             res.status(500).send({message : ex})

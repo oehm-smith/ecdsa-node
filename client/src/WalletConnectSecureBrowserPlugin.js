@@ -33,17 +33,16 @@ export default class WalletConnectSecureBrowserPlugin {
         return keccak256(utf8ToBytes(theMessage));
     }
 
-    static signMessage(from, to, amount) {
-        const privateKey = this.publicPrivateKeys.get(from);    // from is a publicKey - to is also
+    static signMessage(action, publicKey) {
+        const privateKey = this.publicPrivateKeys.get(publicKey);
         if (! privateKey) {
-            const message =`No private key for public key: ${from}`
+            const message =`No private key for public key: ${action.from}`
             console.error(message)
             return { message };
         }
-        const transferData = {operation: "transfer", from, to, amount}
-        const messageHash = this._hashMessage(transferData);
-        const signature = secp256k1.sign(messageHash, privateKey); // Sync methods below
-        const message = {operation: "transfer", from: prepareAddress(from), to: prepareAddress(to), amount}
-        return { signature, transferData, message };
+        const actionHash = this._hashMessage(action);
+        const signature = secp256k1.sign(actionHash, privateKey); // Sync methods below
+        const message = {operation: "transfer", from: prepareAddress(action.from), to: prepareAddress(action.to), amount: action.amount}
+        return { signature, message };
     }
 }
