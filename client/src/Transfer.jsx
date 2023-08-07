@@ -8,7 +8,7 @@ import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin
 import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
 import JSONbig from "json-bigint"
 
-function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled }) {
+function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled }) {
   const [message, setMessage] = useState("");
   const [sendAmount, setSendAmount] = useState("");
   // const [recipient, setRecipient] = useState("");
@@ -21,7 +21,7 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
       await getAllWallets();
     }
     doIt();
-  }, [address])
+  }, [publicKey])
 
   useEffect(() => {
     if (balance == 0) {
@@ -33,8 +33,8 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
 
   async function transfer(evt) {
     evt.preventDefault();
-    const action = {operation: "transfer", from: address, to: selectedWallet, amount: sendAmount}
-    const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, address);  // todo change address to publicKey
+    const action = {operation: "transfer", from: publicKey, to: selectedWallet, amount: sendAmount}
+    const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, publicKey);  // todo change address to publicKey
     if (message) {
       setMessage(JSON.stringify(message));
     }
@@ -42,7 +42,7 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
     log.debug(`transferSignature: ${JSONStringify(signature)}`)
     const signature2 = JSONbig.stringify(signature);
     try {
-      const url = `users/${loggedInUser}/wallets/${address}/transfer`;
+      const url = `users/${loggedInUser}/wallets/${publicKey}/transfer`;
       const response = await server.post(url, {
         action,
         signature:signature2
@@ -59,7 +59,7 @@ function Transfer({ address, balance, setBalance, loggedInUser, transferDialogDi
         data: { message, wallets },
       } = await server.get(`users/walletAddresses`);
       // console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
-      setAllWallets(wallets.filter(w => w !== address));
+      setAllWallets(wallets.filter(w => w !== publicKey));
     } catch (ex) {
       log.error(`getAllWallets error response: ${ex}`)
       return null;

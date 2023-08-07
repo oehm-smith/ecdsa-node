@@ -6,7 +6,7 @@ import User from "./User.jsx"
 
 function App() {
     const [balance, setBalance] = useState(0);
-    const [address, setAddress] = useState("");
+    const [publicKey, setPublicKey] = useState("");
     const [loggedInUser, setLoggedInUser] = useState("");
     const [connectedWallet, setConnectedWallet] = useState("");
     const [transferDialogDisabled, setTransferDialogDisabled] = useState(true);
@@ -24,8 +24,8 @@ function App() {
             <Wallet
                 balance={balance}
                 setBalance={setBalance}
-                address={address}
-                setAddress={setAddress}
+                publicKey={publicKey}
+                setPublicKey={setPublicKey}
                 loggedInUser={loggedInUser}
                 transferDialogDisabled={transferDialogDisabled}
                 setTransferDialogDisabled={setTransferDialogDisabled}
@@ -33,7 +33,7 @@ function App() {
             <Transfer
                 balance={balance}
                 setBalance={setBalance}
-                address={address}
+                publicKey={publicKey}
                 loggedInUser={loggedInUser}
                 transferDialogDisabled={transferDialogDisabled}
                 setTransferDialogDisabled={setTransferDialogDisabled}
