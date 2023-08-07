@@ -122,11 +122,11 @@ function User({ loggedInUser, setLoggedInUser }) {
             </label>
             <p>Users: {users.join(', ')}</p>
 
-            <button className="button" onClick={() => createNewUser(newUser)}>
+            <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
                 Create New User
             </button>
             {/*<input type="submit" className="button" value="login" />*/}
-            <button className="button" onClick={login}>Login</button>
+            <button className="button" disabled={newUser.length === 0} onClick={login}>Login</button>
             <XMessage message={message}/>
         </form>
     );
