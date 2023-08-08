@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import log from 'loglevel';
+import { toast } from 'react-toastify';
+
 import server from "./server";
 import Select from "react-select"
 import XMessage from "./XMessage.jsx"
-import { JSONStringify, prepareAddress } from "./Utils.js"
+import { prepareAddress } from "./Utils.js"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
-import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
 import JSONbig from "json-bigint"
 
-function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled }) {
+function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
   const [message, setMessage] = useState("");
   const [sendAmount, setSendAmount] = useState("");
   // const [recipient, setRecipient] = useState("");
@@ -21,7 +22,7 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
       await getAllWallets();
     }
     doIt();
-  }, [publicKey])
+  }, [publicKey, isNewWallet])
 
   useEffect(() => {
     if (balance == 0) {
@@ -31,15 +32,25 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
-  async function transfer(evt) {
-    evt.preventDefault();
+  function displaySuccessNotification(message) {
+    toast(`Transfer ${message.amount} from ${message.from} to ${message.to}`);
+  }
+
+  function displayNotEnoughFundsNotification(from, amount) {
+    toast(`Unable to transfer ${amount} from ${from} - not enough funds (only has ${balance})`);
+  }
+
+  async function performTransfer() {
     const action = {operation: "transfer", from: publicKey, to: selectedWallet, amount: sendAmount}
     const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, publicKey);  // todo change address to publicKey
+    if (balance - sendAmount < 0) {
+      displayNotEnoughFundsNotification(prepareAddress(publicKey), sendAmount);
+      return;
+    }
     if (message) {
-      setMessage(JSON.stringify(message));
+      displaySuccessNotification(message);
     }
     log.info(JSON.stringify(message))
-    log.debug(`transferSignature: ${JSONStringify(signature)}`)
     const signature2 = JSONbig.stringify(signature);
     try {
       const url = `users/${loggedInUser}/wallets/${publicKey}/transfer`;
@@ -53,7 +64,12 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
     }
   }
 
-  async function getAllWallets() {
+  async function transfer(evt) {
+    evt.preventDefault();
+    performTransfer();
+    setIsNewWallet(true); // force a refresh
+  }
+    async function getAllWallets() {
     try {
       const {
         data: { message, wallets },

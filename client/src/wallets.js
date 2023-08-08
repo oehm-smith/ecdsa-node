@@ -8,12 +8,7 @@ export async function createWallet(user, thePublicKey, balance = 0) {
             balance,
         });
         console.log(`createWallet - message: ${message}`)
-        // loadUserWallets();
     } catch (ex) {
-        if (ex.response) {
-            alert(ex.response.data.message);
-        } else {
-            alert(ex);
-        }
+        throw new Error(`Error creating new Wallet - user: ${user}, publicKey: ${thePublicKey}, balance: ${balance}`)
     }
 }

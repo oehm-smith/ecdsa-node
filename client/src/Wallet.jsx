@@ -6,6 +6,7 @@ import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
 import { prepareAddress } from "./Utils.js"
 import { createWallet } from "./wallets.js"
+import log from "loglevel"
 
 const customStyles = {
   content: {
@@ -21,7 +22,7 @@ const customStyles = {
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
 Modal.setAppElement('#root');
 
-function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, setTransferDialogDisabled }) {
+function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
   const [message, setMessage] = useState("");
   const [wallets, setWallets] = useState({});
   const [loginModalDisabled, setLoginModalDisabled] = useState(true);
@@ -29,21 +30,31 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   const [walletConnectModalIsOpen, setWalletConnectModalIsOpen] = useState(false);
   const [hasWalletConnectModalBeenOpenForUser, setHasWalletConnectModalBeenOpenForUser] = useState(false);
 
-
   useEffect(() => {
     setMessage('');
   }, []);
 
   useEffect(() => {
+    if (isNewWallet) {
+      runChange();
+      setIsNewWallet(false);
+      getWallet(loggedInUser, selectedWallet);
+    }
+  }, [isNewWallet]);
+
+  useEffect(() => {
+      runChange();
+  }, [loggedInUser]);
+
+  function runChange() {
     console.log(`Wallet - user changed to ${loggedInUser}`);
     loadUserWallets();
     // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
     setHasWalletConnectModalBeenOpenForUser(false);
-    setSelectedWallet(" ");
-    setBalance(0);
+    // setSelectedWallet(" ");
+    // setBalance(0);
     setLoginModalDisabled(false);
-  }, [loggedInUser]); // Only re-run the effect if count changes
-
+  }
   async function loadUserWallets(){
     if (loggedInUser) {
       const userWallets = await getWallets(loggedInUser);
@@ -136,7 +147,8 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   async function newWallet() {
     const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-    return createWallet(loggedInUser, publicKey);
+    createWallet(loggedInUser, publicKey);
+    setIsNewWallet(true);
   }
 
   console.log(`selectedWallet: ${selectedWallet}`)
