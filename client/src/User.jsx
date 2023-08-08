@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
+import log from 'loglevel';
 import server from "./server";
 import XMessage from "./XMessage.jsx"
+import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
+import { createWallet } from "./wallets.js"
 
 function User({ loggedInUser, setLoggedInUser }) {
     const [newUser, setNewUser] = useState("");
     const [message, setMessage] = useState("");
     const [users, setUsers] = useState([]);
     const setValue = (setter) => (evt) => setter(evt.target.value);
+
+    log.enableAll();
 
     useEffect(() => {
         const doIt = async () => {
@@ -18,7 +23,7 @@ function User({ loggedInUser, setLoggedInUser }) {
     async function login(evt) {
         evt.preventDefault();
 
-        console.log(`doLogin: ${newUser}`)
+        log.debug(`doLogin: ${newUser}`)
         try {
             const {
                 data: { message },
@@ -26,7 +31,7 @@ function User({ loggedInUser, setLoggedInUser }) {
                 user: newUser,
             });
             setLoggedInUser(newUser);
-            console.log(`doLogin response: ${message}`);
+            log.debug(`doLogin response: ${message}`);
         } catch (ex) {
             console.log(`ex response: ${JSON.stringify(ex)}`)
             if (ex.response.status === 401) {
@@ -38,15 +43,14 @@ function User({ loggedInUser, setLoggedInUser }) {
     }
 
     async function getUsers() {
-        console.log(`getUsers`);
         try {
             const {
                 data: { users },
-            } = await server.get(`users`);
+            } = await server.get(`/users`);
             setUsers(users);
-            console.log(`getUsers response: ${users}`);
+            log.debug(`getUsers: ${JSON.stringify(users)}`);
         } catch (ex) {
-            console.log(`getUsers error - ex response: ${JSON.stringify(ex)}`)
+            log.debug(`getUsers error - ex response: ${JSON.stringify(ex)}`)
             if (ex.response.status === 401) {
                 setMessage(`User doesnt exist: ${newUser}`);
             } else {
@@ -56,7 +60,7 @@ function User({ loggedInUser, setLoggedInUser }) {
     }
 
     async function addNewUser(theNewUser){
-        console.log(`addNewUser: ${theNewUser}`)
+        log.debug(`addNewUser: ${theNewUser}`)
         try {
             const {
                 data: { message },
@@ -64,20 +68,49 @@ function User({ loggedInUser, setLoggedInUser }) {
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
-            console.log(`addNewUser response: ${message}`);
+            log.debug(`addNewUser: ${theNewUser} - response: ${message}`);
         } catch (ex) {
-            console.log(ex.message);//.data.message);
+            log.error(ex.message);//.data.message);
             setMessage(ex.message);
         }
     }
 
     async function createNewUser(evt) {
-        console.log(`createNewUser: ${newUser}`)
+        log.debug(`createNewUser: ${newUser}`)
         addNewUser(newUser);
+    }
+
+    async function clearUsers() {
+        const response = await server.delete("users")
+        await getUsers();
+    }
+
+    async function setupDummyUsers(evt) {
+        console.log(`setupDummyUsers - evt: ${evt}`)
+        evt.preventDefault();
+        const dummyUsers = ['tom', 'dan'];
+        await clearUsers();
+        // log.debug(`Add dummy users before for: ${JSON.stringify(dummyUsers)}`)
+        for (const dummyUser of dummyUsers) {
+            const doIt = async () => {
+                const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
+
+                log.debug(`Add dummy user: ${dummyUser}`)
+                await addNewUser(dummyUser)
+                await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
+            };
+            await doIt();
+        }
+        await getUsers();
+    }
+
+    const headerMessageStyle = {
+        fontSize: "0.5em",
     }
     return (
         <form className="container login">
-            <h1>User</h1> (Browser - not part of this app as such)
+            <h1>User <span style={ headerMessageStyle }>(Browser - not part of this app as such)</span></h1>
+            <button className="button" onClick={setupDummyUsers}>Create dummy users</button>
 
             <p>Current user: {loggedInUser}</p>
             <label>
@@ -89,11 +122,11 @@ function User({ loggedInUser, setLoggedInUser }) {
             </label>
             <p>Users: {users.join(', ')}</p>
 
-            <button className="button" onClick={() => createNewUser(newUser)}>
+            <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
                 Create New User
             </button>
             {/*<input type="submit" className="button" value="login" />*/}
-            <button className="button" onClick={login}>Login</button>
+            <button className="button" disabled={newUser.length === 0} onClick={login}>Login</button>
             <XMessage message={message}/>
         </form>
     );

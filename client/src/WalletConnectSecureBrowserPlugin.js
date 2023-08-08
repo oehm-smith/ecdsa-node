@@ -1,5 +1,7 @@
 import { secp256k1 } from "ethereum-cryptography/secp256k1";
-import { toHex } from "ethereum-cryptography/utils"
+import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
+import { keccak256 } from "ethereum-cryptography/keccak";
+import { isObject, prepareAddress } from "./Utils.js"
 
 /**
  * This source represents the browser plugin for Public / Private keys that is normally used
@@ -18,8 +20,9 @@ export default class WalletConnectSecureBrowserPlugin {
         const privateKey = secp256k1.utils.randomPrivateKey();
         const publicKey = secp256k1.getPublicKey(privateKey, false);
 
-        this.publicPrivateKeys.set(publicKey, privateKey);
-        return toHex(publicKey);
+        const publicKeyHex = toHex(publicKey);
+        this.publicPrivateKeys.set(publicKeyHex, privateKey);
+        return publicKeyHex;
     }
 
     static _hashMessage (message) {
@@ -30,14 +33,16 @@ export default class WalletConnectSecureBrowserPlugin {
         return keccak256(utf8ToBytes(theMessage));
     }
 
-    static signMessage(publicKey) {
-        const privateKey = map.get(toHex(publicKey));
+    static signMessage(action, publicKey) {
+        const privateKey = this.publicPrivateKeys.get(publicKey);
         if (! privateKey) {
-            console.error(`No private key for public key: ${publicKey}`)
-            return null;
+            const message =`No private key for public key: ${action.from}`
+            console.error(message)
+            return { message };
         }
-        const messageHash = this._hashMessage(JSON.stringify(message));
-        const signature = secp256k1.sign(messageHash, privateKey); // Sync methods below
-        return signature;
+        const actionHash = this._hashMessage(action);
+        const signature = secp256k1.sign(actionHash, privateKey); // Sync methods below
+        const message = {operation: "transfer", from: prepareAddress(action.from), to: prepareAddress(action.to), amount: action.amount}
+        return { signature, message };
     }
 }

@@ -4,6 +4,9 @@ import XMessage from "./XMessage.jsx"
 import Modal from 'react-modal';
 import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
+import { prepareAddress } from "./Utils.js"
+import { createWallet } from "./wallets.js"
+import log from "loglevel"
 
 const customStyles = {
   content: {
@@ -19,31 +22,43 @@ const customStyles = {
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
 Modal.setAppElement('#root');
 
-function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
+function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
   const [message, setMessage] = useState("");
-  const [wallets, setWallets] = useState([]);
+  const [wallets, setWallets] = useState({});
   const [loginModalDisabled, setLoginModalDisabled] = useState(true);
   const [selectedWallet, setSelectedWallet] = useState('');
   const [walletConnectModalIsOpen, setWalletConnectModalIsOpen] = useState(false);
-
+  const [hasWalletConnectModalBeenOpenForUser, setHasWalletConnectModalBeenOpenForUser] = useState(false);
 
   useEffect(() => {
     setMessage('');
   }, []);
 
   useEffect(() => {
+    if (isNewWallet) {
+      runChange();
+      setIsNewWallet(false);
+      getWallet(loggedInUser, selectedWallet);
+    }
+  }, [isNewWallet]);
+
+  useEffect(() => {
+      runChange();
+  }, [loggedInUser]);
+
+  function runChange() {
     console.log(`Wallet - user changed to ${loggedInUser}`);
     loadUserWallets();
-    // New user chosen, so their Wallet Connection must be logged in to
-    setSelectedWallet(" ");
-    setBalance(0);
+    // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
+    setHasWalletConnectModalBeenOpenForUser(false);
+    // setSelectedWallet(" ");
+    // setBalance(0);
     setLoginModalDisabled(false);
-    openWalletConnectModal();
-  }, [loggedInUser]); // Only re-run the effect if count changes
-
+  }
   async function loadUserWallets(){
     if (loggedInUser) {
       const userWallets = await getWallets(loggedInUser);
+      console.log(`userWallets: ${JSON.stringify(userWallets)}`)
     }
   }
 
@@ -80,12 +95,11 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
         setMessage(ex.message);
       }
     }
-
   }
 
   async function onChange(evt) {
     const address = evt.target.value;
-    setAddress(address);
+    setPublicKey(address);
     if (address) {
       const {
         data: { balance },
@@ -110,20 +124,20 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
     setLoginModalDisabled(false);
   }
 
-  const prepareAddress = (publicKey) => {
-    if (publicKey.length > 16) {
-      return "0x" + publicKey.slice(0, 6) + "..." + publicKey.slice(-6);
-    }
-    return publicKey;
-  }
-
   const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: prepareAddress(w)}));
   // walletsOptions.push({value: " ", label: " "});
 
   function walletSelected(theSelectedWallet) {
     console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
+    if (! hasWalletConnectModalBeenOpenForUser) {
+      setWalletConnectModalIsOpen(true);
+      setHasWalletConnectModalBeenOpenForUser(true);
+    }
     setSelectedWallet(theSelectedWallet.value)
+    // DUPE ???????
+    setPublicKey(theSelectedWallet.value);
     getWallet(loggedInUser, theSelectedWallet.value);
+    setTransferDialogDisabled(false);
   }
 
   function clearWallets() {
@@ -133,31 +147,14 @@ function Wallet({ address, setAddress, balance, setBalance, loggedInUser }) {
   async function newWallet() {
     const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-    async function createWallet() {
-      try {
-        const {
-          data: { message },
-        } = await server.post(`users/` + loggedInUser + '/wallets/' + publicKey, {
-          balance: 0,
-        });
-        console.log(`createWallet - message: ${message}`)
-        loadUserWallets();
-      } catch (ex) {
-        if (ex.response) {
-          alert(ex.response.data.message);
-        } else {
-          alert(ex);
-        }
-      }
-    }
-
-    return createWallet();
+    createWallet(loggedInUser, publicKey);
+    setIsNewWallet(true);
   }
 
   console.log(`selectedWallet: ${selectedWallet}`)
   return (
     <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
-      <h1>Your Wallet</h1>
+      <h1>Your Wallets</h1>
 
       <div>
         <Select defaultValue={selectedWallet}

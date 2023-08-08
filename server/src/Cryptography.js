@@ -1,6 +1,9 @@
-const secp256k1 = require("ethereum-cryptography/secp256k1");
+const { secp256k1 } = require("ethereum-cryptography/secp256k1");
 // const toHex = require("ethereum-cryptography/utils");
-const utils = require("ethereum-cryptography/utils");
+const { utf8ToBytes } = require("ethereum-cryptography/utils");
+const { keccak256 } = require("ethereum-cryptography/keccak");
+const { fixSignatureJSON, unserialize, Signature } = require("./Utils")
+const { isObject } = require("./Utils");
 
 /**
  * This source represents the browser plugin for Public / Private keys that is normally used
@@ -40,6 +43,14 @@ class Cryptography {
         const messageHash = this._hashMessage(JSON.stringify(message));
         const signature = secp256k1.sign(messageHash, privateKey); // Sync methods below
         return signature;
+    }
+
+    static verify(signature, message, publicKey) {
+        const messageHash = this._hashMessage(message);
+
+        // Signature is json and need to reconstruct a signature that has two fields - r and s and they are both bigints
+        const signatureFixed = {r: signature.r, s: signature.s, recovery: signature.recovery};  //new Signature(signature);
+        return secp256k1.verify(signatureFixed, messageHash, publicKey);
     }
 }
 
