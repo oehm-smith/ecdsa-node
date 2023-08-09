@@ -22,8 +22,7 @@ const customStyles = {
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
 Modal.setAppElement('#root');
 
-function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
-  const [message, setMessage] = useState("");
+function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, setTransferDialogDisabled, isNewWallet, setIsNewWallet, message, setMessage }) {
   const [wallets, setWallets] = useState({});
   const [loginModalDisabled, setLoginModalDisabled] = useState(true);
   const [selectedWallet, setSelectedWallet] = useState('');
@@ -164,7 +163,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
       </div>
 
       <div className="balance">Balance: {balance}</div>
-      <XMessage message={message}/>
       <button onClick={newWallet}>New Wallet</button>
 
       <Modal

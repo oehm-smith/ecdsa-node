@@ -4,13 +4,11 @@ import { toast } from 'react-toastify';
 
 import server from "./server";
 import Select from "react-select"
-import XMessage from "./XMessage.jsx"
 import { prepareAddress } from "./Utils.js"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
 import JSONbig from "json-bigint"
 
-function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
-  const [message, setMessage] = useState("");
+function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled, isNewWallet, setIsNewWallet, message, setMessage }) {
   const [sendAmount, setSendAmount] = useState("");
   const [allWallets, setAllWallets] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState('');
@@ -109,7 +107,6 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
         </div>
 
       <input type="submit" className="button" value="Transfer" />
-      <XMessage message={message}/>
     </form>
   );
 }

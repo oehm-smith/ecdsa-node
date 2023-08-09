@@ -5,9 +5,8 @@ import XMessage from "./XMessage.jsx"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
 import { createWallet } from "./wallets.js"
 
-function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
+function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMessage }) {
     const [newUser, setNewUser] = useState("");
-    const [message, setMessage] = useState("");
 
     const setValue = (setter) => (evt) => setter(evt.target.value);
 
@@ -123,7 +122,6 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
             <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
                 Create
             </button>
-            <XMessage message={message}/>
         </form>
     );
 }
