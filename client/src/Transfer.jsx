@@ -43,10 +43,6 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
       displayNotEnoughFundsNotification(prepareAddress(publicKey), sendAmount);
       return;
     }
-    if (message) {
-      displaySuccessNotification(message);
-    }
-    log.info(JSON.stringify(message))
     const signature2 = JSONbig.stringify(signature);
     try {
       const url = `users/${loggedInUser}/wallets/${publicKey}/transfer`;
@@ -54,7 +50,10 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
         action,
         signature:signature2
       });
-      console.log(`status: ${response.status}`)
+      if (message) {
+        displaySuccessNotification(message);
+      }
+      log.info(JSON.stringify(message))
     } catch (ex) {
       log.error(ex);
     }

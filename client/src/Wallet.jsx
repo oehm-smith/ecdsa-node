@@ -8,12 +8,12 @@ import { createWallet } from "./wallets.js"
 
 const customStyles = {
   content: {
-    top: '50%',
+    top: '25%',
     left: '50%',
     right: 'auto',
     bottom: 'auto',
     marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
+    transform: 'translate(-50%, -25%)',
   },
   width: '100%'
 };
@@ -41,14 +41,14 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   }, [isNewWallet]);
 
   useEffect(() => {
-      runChange();
+    runChange();
+    // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
+    setHasWalletConnectModalBeenOpenForUser(false);
   }, [loggedInUser]);
 
   function runChange() {
     console.log(`Wallet - user changed to ${loggedInUser}`);
     loadUserWallets();
-    // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
-    setHasWalletConnectModalBeenOpenForUser(false);
     setLoginModalDisabled(false);
   }
   async function loadUserWallets(){
