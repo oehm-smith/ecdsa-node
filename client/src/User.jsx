@@ -5,10 +5,10 @@ import XMessage from "./XMessage.jsx"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
 import { createWallet } from "./wallets.js"
 
-function User({ loggedInUser, setLoggedInUser }) {
+function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
     const [newUser, setNewUser] = useState("");
     const [message, setMessage] = useState("");
-    const [users, setUsers] = useState([]);
+
     const setValue = (setter) => (evt) => setter(evt.target.value);
 
     log.enableAll();
@@ -108,25 +108,25 @@ function User({ loggedInUser, setLoggedInUser }) {
         fontSize: "0.5em",
     }
     return (
-        <form className="container login">
-            <h1>User <span style={ headerMessageStyle }>(Browser - not part of this app as such)</span></h1>
-            <button className="button" onClick={setupDummyUsers}>Create dummy users</button>
+        <form className="container user">
+            {/*<h1>User</h1>*/}
+                {/*<span style={ headerMessageStyle }><br/>(Browser)</span></h1>*/}
+            <button className="button" onClick={setupDummyUsers}>Dummy</button>
 
-            <p>Current user: {loggedInUser}</p>
+            {/*<p>{loggedInUser}</p>*/}
             <label>
                 <input
-                    placeholder="User"
+                    placeholder="user"
                     value={newUser}
                     onChange={setValue(setNewUser)}
                 ></input>
             </label>
-            <p>Users: {users.join(', ')}</p>
+            <button className="button" disabled={newUser.length === 0} onClick={login}>Choose</button>
 
             <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
-                Create New User
+                Create
             </button>
             {/*<input type="submit" className="button" value="login" />*/}
-            <button className="button" disabled={newUser.length === 0} onClick={login}>Login</button>
             <XMessage message={message}/>
         </form>
     );

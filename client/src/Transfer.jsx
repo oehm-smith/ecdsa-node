@@ -102,15 +102,16 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
 
       <label>
         Send Amount
+      </label>
         <input
           placeholder="1, 2, 3..."
           value={sendAmount}
           onChange={setValue(setSendAmount)}
         ></input>
-      </label>
 
       <label>
         Recipient
+      </label>
         {/*<input*/}
         {/*  placeholder="Type an address, for example: 0x2"*/}
         {/*  value={recipient}*/}
@@ -122,7 +123,6 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
                   onChange={walletSelected}
           />
         </div>
-      </label>
 
       <input type="submit" className="button" value="Transfer" />
       <XMessage message={message}/>
