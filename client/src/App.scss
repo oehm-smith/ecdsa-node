@@ -151,10 +151,11 @@ input {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 400;
-    font-size: 0.9em;
+    font-size: 1.2em;
     display: inline-flex;
     margin-top: 0px;
     padding: 0.5rem;
+    color: darkgreen;
     //background-color: #f4f6f8;
   }
 }
@@ -164,6 +165,10 @@ input {
   flex-direction: column;
   max-width: 500px;
   //background-color: #319795;
+}
+
+.WalletModalInput {
+    width: 100%;
 }
 
 Select {

@@ -1,12 +1,10 @@
 import server from "./server";
 import React, { useEffect, useState } from "react"
-import XMessage from "./XMessage.jsx"
 import Modal from 'react-modal';
 import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
 import { prepareAddress } from "./Utils.js"
 import { createWallet } from "./wallets.js"
-import log from "loglevel"
 
 const customStyles = {
   content: {
@@ -17,6 +15,7 @@ const customStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
   },
+  width: '100%'
 };
 
 // Make sure to bind modal to your appElement (https://reactcommunity.org/react-modal/accessibility/)
@@ -50,8 +49,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     loadUserWallets();
     // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
     setHasWalletConnectModalBeenOpenForUser(false);
-    // setSelectedWallet(" ");
-    // setBalance(0);
     setLoginModalDisabled(false);
   }
   async function loadUserWallets(){
@@ -162,7 +159,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
         />
       </div>
 
-      <div className="balance">Balance: {balance}</div>
+      <div className="balance">{balance}</div>
       <button onClick={newWallet}>New Wallet</button>
 
       <Modal
@@ -173,10 +170,9 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
           contentLabel="Unlock wallet"
       >
         <h2>Login to Wallet Connection</h2>
-        <button onClick={closeModal}>submit</button>
-        <div> password</div>
         <form>
-          <input />
+          <label>Password</label><input placeholder="Anything or nothing (dev build)"  className="WalletModalInput"/>
+          <button onClick={closeModal}>submit</button>
         </form>
       </Modal>
     </div>
