@@ -154,7 +154,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   console.log(`selectedWallet: ${selectedWallet}`)
   return (
     <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
-      <h1>Your Wallets</h1>
+      <h1>Wallets</h1>
 
       <div>
         <Select defaultValue={selectedWallet}
