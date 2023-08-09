@@ -73,7 +73,7 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
     try {
       const {
         data: { message, wallets },
-      } = await server.get(`users/walletAddresses`);
+      } = await server.get(`users/wallets`);
       // console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
       setAllWallets(wallets.filter(w => w !== publicKey));
     } catch (ex) {

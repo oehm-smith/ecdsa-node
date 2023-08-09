@@ -51,7 +51,8 @@ module.exports=function(app) {
         console.log(`all users: ${userWallets.getUsers()}`);
     })
 
-    app.get("/users/walletAddresses", (req, res) => {
+    // TODO - change walletAddresses
+    app.get("/users/wallets", (req, res) => {
         const allWallets = userWallets.getAllWalletAddressess();
         console.log(`allWallets: ${JSON.stringify(allWallets)}`);
         if (!allWallets) {

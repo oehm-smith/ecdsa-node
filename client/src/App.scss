@@ -28,7 +28,7 @@ label {
   flex: 0 1 auto;
 
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
 
   justify-content: space-between;
   align-items: start;
@@ -38,6 +38,7 @@ label {
   margin: 0;
   list-style: none;
   //border: 1px solid yellowgreen;
+  background-color: rosybrown;
 
   font-size: x-small;
 }
@@ -155,7 +156,7 @@ input {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 400;
-    font-size: .7em;
+    font-size: 0.9em;
     display: inline-flex;
     margin-top: 0px;
     padding: 0.5rem;
