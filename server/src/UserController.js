@@ -21,7 +21,6 @@ module.exports=function(app) {
 
         let message = `User ${user} - created`;
         userWallets.addUser(user)
-        console.log(`all users: ${userWallets.getUsers()}`);
 
         res.status(StatusCodes.CREATED).send({message});
     })
@@ -42,7 +41,6 @@ module.exports=function(app) {
         const userData = userWallets.getUser(user);
         if (userData === null) {
             message = `user doesn't exist: ${user}`;
-            // res.status(401).json({message})
             res.status(StatusCodes.UNAUTHORIZED).send({ data: message })
         } else {
             message += userData;
@@ -51,13 +49,11 @@ module.exports=function(app) {
         console.log(`all users: ${userWallets.getUsers()}`);
     })
 
-    // TODO - change walletAddresses
     app.get("/users/wallets", (req, res) => {
         const allWallets = userWallets.getAllWalletAddressess();
         console.log(`allWallets: ${JSON.stringify(allWallets)}`);
         if (!allWallets) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            // res.status(401).json({message})
             res.status(StatusCodes.NOT_FOUND).send({ data: message, wallets: null })
         } else {
             res.send({ message: "all good", wallets: allWallets })
@@ -71,7 +67,6 @@ module.exports=function(app) {
 
         if (!walletsMap) {
             message = `user doesn't exist (no wallets): ${user}`;
-            // res.status(401).json({message})
             res.status(StatusCodes.NOT_FOUND).send({ data: message })
         } else {
             const wallets = Object.fromEntries(walletsMap);
@@ -87,7 +82,6 @@ module.exports=function(app) {
 
         if (!wallet) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            // res.status(401).json({message})
             res.status(400).send({ data: message })
         } else {
             res.send({ message: "all good", wallet })
@@ -127,15 +121,8 @@ module.exports=function(app) {
         let message;
 
         try {
-            // let signatureP = unserialize(signature, RecoveredSignatureType);
             let signatureObj = JSONbig.parse(signature); //bytesToUtf8(signature);
             userWallets.transfer(action, signatureObj);
-            //
-            //
-            // message = `User existed - added new public key: ${user}, ${publicKey}`;
-            // if (!userAlreadyExisted) {
-            //     message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
-            // }
             res.send({ action })
         } catch (ex) {
             console.error(ex);

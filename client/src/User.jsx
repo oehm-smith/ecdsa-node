@@ -23,7 +23,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
     async function login(evt) {
         evt.preventDefault();
 
-        log.debug(`doLogin: ${newUser}`)
+        log.debug(`choose: ${newUser}`)
         try {
             const {
                 data: { message },
@@ -109,11 +109,8 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
     }
     return (
         <form className="container user">
-            {/*<h1>User</h1>*/}
-                {/*<span style={ headerMessageStyle }><br/>(Browser)</span></h1>*/}
             <button className="button" onClick={setupDummyUsers}>Dummy</button>
 
-            {/*<p>{loggedInUser}</p>*/}
             <label>
                 <input
                     placeholder="user"
@@ -126,7 +123,6 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
             <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
                 Create
             </button>
-            {/*<input type="submit" className="button" value="login" />*/}
             <XMessage message={message}/>
         </form>
     );

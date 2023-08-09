@@ -12,10 +12,8 @@ import JSONbig from "json-bigint"
 function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialogDisabled, setTransferDialogDisabled, isNewWallet, setIsNewWallet }) {
   const [message, setMessage] = useState("");
   const [sendAmount, setSendAmount] = useState("");
-  // const [recipient, setRecipient] = useState("");
   const [allWallets, setAllWallets] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState('');
-  const [walletPaneDisabled, setWalletPaneDisabled] = useState(true);
 
   useEffect( () => {
     async function doIt(){
@@ -42,7 +40,7 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
 
   async function performTransfer() {
     const action = {operation: "transfer", from: publicKey, to: selectedWallet, amount: sendAmount}
-    const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, publicKey);  // todo change address to publicKey
+    const {  signature, message } = WalletConnectSecureBrowserPlugin.signMessage(action, publicKey);
     if (balance - sendAmount < 0) {
       displayNotEnoughFundsNotification(prepareAddress(publicKey), sendAmount);
       return;
@@ -74,26 +72,17 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
       const {
         data: { message, wallets },
       } = await server.get(`users/wallets`);
-      // console.log(`getAllWallets response - message: ${message}, wallets: ${JSON.stringify(wallets)}, address: ${address}`);
       setAllWallets(wallets.filter(w => w !== publicKey));
     } catch (ex) {
       log.error(`getAllWallets error response: ${ex}`)
       return null;
-      // if (ex.response.status === 400) {
-      //   setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
-      // } else {
-      //   setMessage(ex.message);
-      // }
     }
   }
 
   const allWalletsOptions = allWallets.map(w => ({value: w, label: prepareAddress(w)}));
-  // console.log(`allWalletsOptions: ${JSON.stringify(allWalletsOptions)}`)
 
   function walletSelected(theSelectedWallet) {
-    // console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
     setSelectedWallet(theSelectedWallet.value)
-    // getWallet(loggedInUser, theSelectedWallet.value);
   }
 
   return (
@@ -112,11 +101,6 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
       <label>
         Recipient
       </label>
-        {/*<input*/}
-        {/*  placeholder="Type an address, for example: 0x2"*/}
-        {/*  value={recipient}*/}
-        {/*  onChange={setValue(setRecipient)}*/}
-        {/*></input>*/}
         <div>
           <Select defaultValue={selectedWallet}
                   options={allWalletsOptions}

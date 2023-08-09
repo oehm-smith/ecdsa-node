@@ -165,7 +165,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
 
       <div className="balance">Balance: {balance}</div>
       <XMessage message={message}/>
-      {/*<button onClick={clearWallets}>Clear Wallet</button>*/}
       <button onClick={newWallet}>New Wallet</button>
 
       <Modal
@@ -176,7 +175,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
           contentLabel="Unlock wallet"
       >
         <h2>Login to Wallet Connection</h2>
-        {/*ref={(_subtitle) => (subtitle = _subtitle)}*/}
         <button onClick={closeModal}>submit</button>
         <div> password</div>
         <form>
