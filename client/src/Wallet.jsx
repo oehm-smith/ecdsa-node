@@ -125,9 +125,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     setLoginModalDisabled(false);
   }
 
-  const walletsOptions = Object.keys(wallets).map(w => ({value: w, label: prepareAddress(w)}));
-  // walletsOptions.push({value: " ", label: " "});
-
   function walletSelected(theSelectedWallet) {
     if (! hasWalletConnectModalBeenOpenForUser) {
       setWalletConnectModalIsOpen(true);
@@ -143,11 +140,17 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     setSelectedWallet(" "); // I can't work out how to set selectedWallet to "" / null when new user chosen
   }
 
-  async function newWallet() {
+  async function newWallet(evt) {
+    evt.preventDefault();
     const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
     createWallet(loggedInUser, publicKey);
     setIsNewWallet(true);
+  }
+
+  function getWalletsForSelect() {
+    const walletsOptions = Object.keys(wallets).map(w => ({ value: w, label: prepareAddress(w) }));
+    return walletsOptions;
   }
 
   return (
@@ -156,7 +159,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
 
       <div>
         <Select defaultValue={selectedWallet}
-          options={walletsOptions}
+          options={getWalletsForSelect()}
           onChange={walletSelected}
         />
       </div>
