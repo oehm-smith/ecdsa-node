@@ -5,6 +5,7 @@ import Select from "react-select"
 import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin.js'
 import { prepareAddress } from "./Utils.js"
 import { createWallet } from "./wallets.js"
+import log from 'loglevel';
 
 const customStyles = {
   content: {
@@ -53,8 +54,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   }
   async function loadUserWallets(){
     if (loggedInUser) {
-      const userWallets = await getWallets(loggedInUser);
-      console.log(`userWallets: ${JSON.stringify(userWallets)}`)
+      await getWallets(loggedInUser);
     }
   }
 
@@ -63,10 +63,10 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
       const {
         data: { message, wallets },
       } = await server.get(`users/` + user);
-      console.log(`getWallets user response - message: ${message}, wallets: ${JSON.stringify(wallets)}`);
+      log.info(`getWallets for: ${user}, message: "${message}", wallets: ${JSON.stringify(wallets)}`);
       setWallets(wallets);
     } catch (ex) {
-      console.log(`ex response: ${JSON.stringify(ex)}`)
+      log.error(`ex response: ${JSON.stringify(ex)}`)
       if (ex.response.status === 400) {
         setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
       } else {
@@ -76,15 +76,14 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   }
 
   async function getWallet(user, givenWallet) {
-    console.log(`getWallet user: ${user}, wallet: ${givenWallet}`);
     try {
       const {
         data: { message, wallet },
       } = await server.get(`users/` + user + '/wallets/' + givenWallet);
-      console.log(`getWallet user response - message: ${message}, wallet: ${JSON.stringify(wallet)}`);
+      log.info(`getWallet for ${user} - message: "${message}", wallet: ${prepareAddress(givenWallet)}`);
       setBalance(wallet.balance)
     } catch (ex) {
-      console.log(`ex response: ${ex}`)
+      log.error(`wallet error response: ${ex}`)
       if (ex?.response.status === 400) {
         setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
       } else {
@@ -124,13 +123,11 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
   // walletsOptions.push({value: " ", label: " "});
 
   function walletSelected(theSelectedWallet) {
-    console.log(`walletSeleted: ${JSON.stringify(theSelectedWallet)}`)
     if (! hasWalletConnectModalBeenOpenForUser) {
       setWalletConnectModalIsOpen(true);
       setHasWalletConnectModalBeenOpenForUser(true);
     }
     setSelectedWallet(theSelectedWallet.value)
-    // DUPE ???????
     setPublicKey(theSelectedWallet.value);
     getWallet(loggedInUser, theSelectedWallet.value);
     setTransferDialogDisabled(false);
@@ -147,7 +144,6 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     setIsNewWallet(true);
   }
 
-  console.log(`selectedWallet: ${selectedWallet}`)
   return (
     <div className="container wallet" style={loginModalDisabled ? {pointerEvents: "none", opacity: "0.4"} : {}}>
       <h1>Wallets</h1>

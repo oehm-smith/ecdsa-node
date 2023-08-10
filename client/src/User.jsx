@@ -94,7 +94,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
             const doIt = async () => {
                 const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-                log.debug(`Add dummy user: ${dummyUser}`)
+                log.debug(`Add dummy user: ${dummyUser} - ${publicKey}`)
                 await addNewUser(dummyUser)
                 await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
             };
@@ -103,9 +103,6 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
         await getUsers();
     }
 
-    const headerMessageStyle = {
-        fontSize: "0.5em",
-    }
     return (
         <form className="container user">
             <button className="button" onClick={setupDummyUsers}>Dummy</button>

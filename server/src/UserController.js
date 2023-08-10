@@ -99,8 +99,7 @@ module.exports=function(app) {
         try {
             const userAlreadyExisted = userWallets.createUpdateUserWallet(user, publicKey, balance);
 
-
-            message = `User existed - added new public key: ${user}, ${publicKey}`;
+            message = `User existed - added new public key for ${user} - ${publicKey}`;
             if (!userAlreadyExisted) {
                 message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
             }
