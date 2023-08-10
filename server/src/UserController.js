@@ -1,6 +1,6 @@
 const Logger = require("./Logger")
 const { StatusCodes } = require("http-status-codes")
-const { unserialize } = require("./Utils")
+const { unserialize, prepareAddress } = require("./Utils")
 const { hexToBytes, bytesToUtf8 } = require("ethereum-cryptography/utils")
 const JSONbig = require('json-bigint')({ useNativeBigInt: true });
 
@@ -19,18 +19,22 @@ module.exports=function(app) {
         const { user } = req.body;
         // console.log(`add user: ${user}`);
 
-        let message = `User ${user} - created`;
-        userWallets.addUser(user)
-        console.log(`all users: ${userWallets.getUsers()}`);
+        try {
+            let message = `User ${user} - created`;
+            userWallets.addUser(user)
 
-        res.status(StatusCodes.CREATED).send({message});
+            return res.status(StatusCodes.CREATED).send({ message });
+        } catch (ex) {
+            logger.error(ex);
+            return res.status(StatusCodes.BAD_REQUEST).send({ message: "Error creating user - " + ex})
+        }
     })
 
     // Get users
     app.get("/users/?$", (req, res) => {
         const users = userWallets.getUsers();
         logger.debug(`All users: ${JSON.stringify(users)}`)
-        res.send({ users })
+        return res.send({ users })
     });
 
     // Login given user
@@ -42,24 +46,22 @@ module.exports=function(app) {
         const userData = userWallets.getUser(user);
         if (userData === null) {
             message = `user doesn't exist: ${user}`;
-            // res.status(401).json({message})
-            res.status(StatusCodes.UNAUTHORIZED).send({ data: message })
+            return res.status(StatusCodes.UNAUTHORIZED).send({ data: message })
         } else {
             message += userData;
-            res.send({ message })
+            return res.send({ message })
         }
         console.log(`all users: ${userWallets.getUsers()}`);
     })
 
-    app.get("/users/walletAddresses", (req, res) => {
+    app.get("/users/wallets", (req, res) => {
         const allWallets = userWallets.getAllWalletAddressess();
-        console.log(`allWallets: ${JSON.stringify(allWallets)}`);
+        logger.debug(`allWallets: ${JSON.stringify(allWallets)}`);
         if (!allWallets) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            // res.status(401).json({message})
-            res.status(StatusCodes.NOT_FOUND).send({ data: message, wallets: null })
+            return res.status(StatusCodes.NOT_FOUND).send({ data: message, wallets: null })
         } else {
-            res.send({ message: "all good", wallets: allWallets })
+            return res.send({ message: "all good", wallets: allWallets })
         }
     });
 
@@ -69,12 +71,14 @@ module.exports=function(app) {
         const walletsMap = userWallets.getUser(user);
 
         if (!walletsMap) {
-            message = `user doesn't exist (no wallets): ${user}`;
-            // res.status(401).json({message})
-            res.status(StatusCodes.NOT_FOUND).send({ data: message })
+            message = `user doesn't exist: ${user}`;
+            return res.status(StatusCodes.GONE).send({ message })
+        } else if (walletsMap.size == 0) {
+            message = `user doesn't have any wallets: ${user}`;
+            return res.status(StatusCodes.NOT_FOUND).send({ message })
         } else {
             const wallets = Object.fromEntries(walletsMap);
-            res.send({ message: "all good", wallets })
+            return res.send({ message: "all good", wallets })
         }
     });
 
@@ -86,10 +90,9 @@ module.exports=function(app) {
 
         if (!wallet) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            // res.status(401).json({message})
-            res.status(400).send({ data: message })
+            return res.status(400).send({ data: message })
         } else {
-            res.send({ message: "all good", wallet })
+            return res.send({ message: "all good", wallet })
         }
     });
 
@@ -104,10 +107,9 @@ module.exports=function(app) {
         try {
             const userAlreadyExisted = userWallets.createUpdateUserWallet(user, publicKey, balance);
 
-
-            message = `User existed - added new public key: ${user}, ${publicKey}`;
+            message = `User existed - added new public key for ${user} - ${prepareAddress(publicKey)}`;
             if (!userAlreadyExisted) {
-                message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
+                message = `User didnt exist - created them and added new public key: ${user}, ${prepareAddress(publicKey)}`;
             }
             res.send({ message })
         } catch (ex) {
@@ -126,15 +128,8 @@ module.exports=function(app) {
         let message;
 
         try {
-            // let signatureP = unserialize(signature, RecoveredSignatureType);
             let signatureObj = JSONbig.parse(signature); //bytesToUtf8(signature);
             userWallets.transfer(action, signatureObj);
-            //
-            //
-            // message = `User existed - added new public key: ${user}, ${publicKey}`;
-            // if (!userAlreadyExisted) {
-            //     message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
-            // }
             res.send({ action })
         } catch (ex) {
             console.error(ex);

@@ -4,10 +4,10 @@ import server from "./server";
 import XMessage from "./XMessage.jsx"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
 import { createWallet } from "./wallets.js"
+import { StatusCodes } from "http-status-codes";
 
-function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
+function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMessage }) {
     const [newUser, setNewUser] = useState("");
-    const [message, setMessage] = useState("");
 
     const setValue = (setter) => (evt) => setter(evt.target.value);
 
@@ -23,7 +23,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
     async function login(evt) {
         evt.preventDefault();
 
-        log.debug(`doLogin: ${newUser}`)
+        log.debug(`choose: ${newUser}`)
         try {
             const {
                 data: { message },
@@ -60,7 +60,6 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
     }
 
     async function addNewUser(theNewUser){
-        log.debug(`addNewUser: ${theNewUser}`)
         try {
             const {
                 data: { message },
@@ -68,16 +67,24 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
-            log.debug(`addNewUser: ${theNewUser} - response: ${message}`);
+            log.info(`addNewUser: ${theNewUser} - response: ${message}`);
         } catch (ex) {
-            log.error(ex.message);//.data.message);
-            setMessage(ex.message);
+            let message;
+            if (ex?.response?.data?.message) {
+                message = ex.response.data.message;
+            } else {
+                message = ex.message;
+            }
+            log.error(message);
+            setMessage(message);
         }
     }
 
     async function createNewUser(evt) {
-        log.debug(`createNewUser: ${newUser}`)
+        evt.preventDefault();
         addNewUser(newUser);
+        await getUsers();
+        setLoggedInUser(newUser);
     }
 
     async function clearUsers() {
@@ -95,7 +102,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
             const doIt = async () => {
                 const publicKey = WalletConnectSecureBrowserPlugin.createNewPublicPrivateKey();
 
-                log.debug(`Add dummy user: ${dummyUser}`)
+                log.debug(`Add dummy user: ${dummyUser} - ${publicKey}`)
                 await addNewUser(dummyUser)
                 await createWallet(dummyUser, publicKey, Math.round(Math.random() * 1000))
             };
@@ -104,16 +111,10 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
         await getUsers();
     }
 
-    const headerMessageStyle = {
-        fontSize: "0.5em",
-    }
     return (
         <form className="container user">
-            {/*<h1>User</h1>*/}
-                {/*<span style={ headerMessageStyle }><br/>(Browser)</span></h1>*/}
             <button className="button" onClick={setupDummyUsers}>Dummy</button>
 
-            {/*<p>{loggedInUser}</p>*/}
             <label>
                 <input
                     placeholder="user"
@@ -123,11 +124,9 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers }) {
             </label>
             <button className="button" disabled={newUser.length === 0} onClick={login}>Choose</button>
 
-            <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
+            <button className="button" disabled={newUser.length === 0} onClick={createNewUser}>
                 Create
             </button>
-            {/*<input type="submit" className="button" value="login" />*/}
-            <XMessage message={message}/>
         </form>
     );
 }

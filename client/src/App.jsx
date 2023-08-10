@@ -6,6 +6,7 @@ import { useState } from "react";
 import User from "./User.jsx"
 import { ToastContainer } from 'react-toastify';
 import UsersList from "./UsersList.jsx"
+import XMessage from "./XMessage.jsx"
 
 function App() {
     const [balance, setBalance] = useState(0);
@@ -14,6 +15,7 @@ function App() {
     const [transferDialogDisabled, setTransferDialogDisabled] = useState(true);
     const [isNewWallet, setIsNewWallet] = useState(false);
     const [users, setUsers] = useState([]);
+    const [message, setMessage] = useState("");
 
     return (
         <div className="app">
@@ -23,6 +25,8 @@ function App() {
                     setLoggedInUser={setLoggedInUser}
                     users={users}
                     setUsers={setUsers}
+                    message={message}
+                    setMessage={setMessage}
                 />
                 <Wallet
                     balance={balance}
@@ -34,6 +38,8 @@ function App() {
                     setTransferDialogDisabled={setTransferDialogDisabled}
                     isNewWallet={isNewWallet}
                     setIsNewWallet={setIsNewWallet}
+                    message={message}
+                    setMessage={setMessage}
                 />
             </div>
             <div className="userslist">
@@ -55,6 +61,8 @@ function App() {
                 />
             </div>
             <ToastContainer/>
+            <XMessage message={message}
+                      setMessage={setMessage}/>
         </div>
     );
 }

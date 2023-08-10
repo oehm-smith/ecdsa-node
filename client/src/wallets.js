@@ -1,4 +1,6 @@
 import server from "./server.js"
+import { prepareAddress } from "./Utils.js"
+import log from 'loglevel';
 
 export async function createWallet(user, thePublicKey, balance = 0) {
     try {
@@ -7,7 +9,7 @@ export async function createWallet(user, thePublicKey, balance = 0) {
         } = await server.post(`users/` + user + '/wallets/' + thePublicKey, {
             balance,
         });
-        console.log(`createWallet - message: ${message}`)
+        log.info(`createWallet - for ${user} with key: ${prepareAddress(thePublicKey)} - message: ${message}`)
     } catch (ex) {
         throw new Error(`Error creating new Wallet - user: ${user}, publicKey: ${thePublicKey}, balance: ${balance}`)
     }

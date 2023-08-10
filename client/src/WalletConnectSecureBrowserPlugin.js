@@ -2,6 +2,7 @@ import { secp256k1 } from "ethereum-cryptography/secp256k1";
 import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
 import { keccak256 } from "ethereum-cryptography/keccak";
 import { isObject, prepareAddress } from "./Utils.js"
+import log from 'loglevel';
 
 /**
  * This source represents the browser plugin for Public / Private keys that is normally used
@@ -22,6 +23,8 @@ export default class WalletConnectSecureBrowserPlugin {
 
         const publicKeyHex = toHex(publicKey);
         this.publicPrivateKeys.set(publicKeyHex, privateKey);
+        log.info(`Create public key: ${prepareAddress(publicKeyHex)} with private key: ${prepareAddress(toHex(privateKey))}`)
+        log.debug(`  Now have this many public keys: ${this.publicPrivateKeys.size}`)
         return publicKeyHex;
     }
 

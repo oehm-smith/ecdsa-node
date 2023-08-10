@@ -28,7 +28,7 @@ label {
   flex: 0 1 auto;
 
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
 
   justify-content: space-between;
   align-items: start;
@@ -38,6 +38,7 @@ label {
   margin: 0;
   list-style: none;
   //border: 1px solid yellowgreen;
+  background-color: rosybrown;
 
   font-size: x-small;
 }
@@ -64,13 +65,10 @@ label {
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
-  //align-items: center;
-  //align-content: center;
 
   padding: 0;
   margin: 0;
   list-style: none;
-  //border: 1px solid yellowgreen;
 }
 
 .user {
@@ -78,8 +76,6 @@ label {
 
   display: flex;
   flex-flow: row nowrap;
-
-  //background-color: coral;
 }
 
 .wallet {
@@ -155,10 +151,11 @@ input {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 400;
-    font-size: .7em;
+    font-size: 1.2em;
     display: inline-flex;
     margin-top: 0px;
     padding: 0.5rem;
+    color: darkgreen;
     //background-color: #f4f6f8;
   }
 }
@@ -168,6 +165,10 @@ input {
   flex-direction: column;
   max-width: 500px;
   //background-color: #319795;
+}
+
+.WalletModalInput {
+    width: 100%;
 }
 
 Select {

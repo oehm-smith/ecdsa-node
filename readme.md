@@ -34,7 +34,7 @@ _Hint_ - Use [nodemon](https://www.npmjs.com/package/nodemon) instead of `node` 
 
 For Oehmsmith's fork of this project.
 
-1. Users - this is a simulation of multiple users in a browser and provides a logical way to switch between different users that have different wallets.
-2. Wallet Connect - This is like a simulation of MetaMask etc... and each user has a collection of wallets
+1. Users - this is a simulation of multiple users in a browser and provides a logical way to switch between different users that have different wallets.  An input box was chosen over a dropdown since as an input it can double for the use of 'create' user
+2. Wallet Connect - This is like a simulation of MetaMask etc... and each user has a collection of wallets.  Selecting the first of a user's wallets will require a login to the wallets
 3. Dropdown containing all wallets in Transfer dialog.  This was decided upon instead of typing wallet addresses to make things simpler for users of this simple application.
 4. 
