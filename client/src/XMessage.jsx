@@ -1,4 +1,14 @@
-function XMessage({message}) {
+import { useEffect } from "react"
+
+function XMessage({message, setMessage}) {
+    useEffect(() => {
+        if (message) {
+            setTimeout(() => {
+                setMessage("");
+            }, 5000);
+        }
+    }, [message]);
+
     const XMessageStyle = {
         fontSize: "0.8em",
         color: 'red',

@@ -61,7 +61,8 @@ function App() {
                 />
             </div>
             <ToastContainer/>
-            <XMessage message={message}/>
+            <XMessage message={message}
+                      setMessage={setMessage}/>
         </div>
     );
 }
