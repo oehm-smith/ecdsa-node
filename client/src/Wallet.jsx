@@ -99,7 +99,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     } catch (ex) {
       log.error(`wallet error response: ${ex}`)
       if (ex?.response.status === 400) {
-        setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
+        setMessage(`User doesnt exist: ${user} or hasn't wallets - create one`);
       } else {
         setMessage(ex.message);
       }

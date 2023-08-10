@@ -34,7 +34,7 @@ module.exports=function(app) {
     app.get("/users/?$", (req, res) => {
         const users = userWallets.getUsers();
         logger.debug(`All users: ${JSON.stringify(users)}`)
-        res.send({ users })
+        return res.send({ users })
     });
 
     // Login given user
@@ -46,22 +46,22 @@ module.exports=function(app) {
         const userData = userWallets.getUser(user);
         if (userData === null) {
             message = `user doesn't exist: ${user}`;
-            res.status(StatusCodes.UNAUTHORIZED).send({ data: message })
+            return res.status(StatusCodes.UNAUTHORIZED).send({ data: message })
         } else {
             message += userData;
-            res.send({ message })
+            return res.send({ message })
         }
         console.log(`all users: ${userWallets.getUsers()}`);
     })
 
     app.get("/users/wallets", (req, res) => {
         const allWallets = userWallets.getAllWalletAddressess();
-        console.log(`allWallets: ${JSON.stringify(allWallets)}`);
+        logger.debug(`allWallets: ${JSON.stringify(allWallets)}`);
         if (!allWallets) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            res.status(StatusCodes.NOT_FOUND).send({ data: message, wallets: null })
+            return res.status(StatusCodes.NOT_FOUND).send({ data: message, wallets: null })
         } else {
-            res.send({ message: "all good", wallets: allWallets })
+            return res.send({ message: "all good", wallets: allWallets })
         }
     });
 
@@ -72,13 +72,13 @@ module.exports=function(app) {
 
         if (!walletsMap) {
             message = `user doesn't exist: ${user}`;
-            res.status(StatusCodes.GONE).send({ message })
+            return res.status(StatusCodes.GONE).send({ message })
         } else if (walletsMap.size == 0) {
             message = `user doesn't have any wallets: ${user}`;
-            res.status(StatusCodes.NOT_FOUND).send({ message })
+            return res.status(StatusCodes.NOT_FOUND).send({ message })
         } else {
             const wallets = Object.fromEntries(walletsMap);
-            res.send({ message: "all good", wallets })
+            return res.send({ message: "all good", wallets })
         }
     });
 
@@ -90,9 +90,9 @@ module.exports=function(app) {
 
         if (!wallet) {
             message = `user or wallet doesn't exist (no wallets): ${user}, ${publicKey}`;
-            res.status(400).send({ data: message })
+            return res.status(400).send({ data: message })
         } else {
-            res.send({ message: "all good", wallet })
+            return res.send({ message: "all good", wallet })
         }
     });
 
