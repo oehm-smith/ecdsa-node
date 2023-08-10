@@ -31,24 +31,30 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
 
   useEffect(() => {
     setMessage('');
+    setLoginModalDisabled(true);
   }, []);
 
   useEffect(() => {
     if (isNewWallet) {
       runChange();
       setIsNewWallet(false);
-      getWallet(loggedInUser, selectedWallet);
+      if (selectedWallet) {
+        getWallet(loggedInUser, selectedWallet);
+      }
     }
   }, [isNewWallet]);
 
   useEffect(() => {
-    runChange();
-    // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
-    setHasWalletConnectModalBeenOpenForUser(false);
+    if (loggedInUser) {
+      runChange();
+      // New user chosen, so their Wallet Connection must be logged in to after selecting a wallet
+      setHasWalletConnectModalBeenOpenForUser(false);
+      setLoginModalDisabled(false);
+    }
   }, [loggedInUser]);
 
   function runChange() {
-    console.log(`Wallet - user changed to ${loggedInUser}`);
+    log.info(`Wallet - user changed to ${loggedInUser}`);
     loadUserWallets();
     setLoginModalDisabled(false);
   }
