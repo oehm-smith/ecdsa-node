@@ -74,8 +74,10 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
     }
 
     async function createNewUser(evt) {
-        log.debug(`createNewUser: ${newUser}`)
+        evt.preventDefault();
         addNewUser(newUser);
+        await getUsers();
+        setLoggedInUser(newUser);
     }
 
     async function clearUsers() {
@@ -115,7 +117,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
             </label>
             <button className="button" disabled={newUser.length === 0} onClick={login}>Choose</button>
 
-            <button className="button" disabled={newUser.length === 0} onClick={() => createNewUser(newUser)}>
+            <button className="button" disabled={newUser.length === 0} onClick={createNewUser}>
                 Create
             </button>
         </form>
