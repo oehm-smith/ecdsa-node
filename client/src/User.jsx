@@ -4,6 +4,7 @@ import server from "./server";
 import XMessage from "./XMessage.jsx"
 import WalletConnectSecureBrowserPlugin from "./WalletConnectSecureBrowserPlugin.js"
 import { createWallet } from "./wallets.js"
+import { StatusCodes } from "http-status-codes";
 
 function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMessage }) {
     const [newUser, setNewUser] = useState("");
@@ -68,8 +69,14 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
             // setLoggedInUser(theNewUser);
             log.info(`addNewUser: ${theNewUser} - response: ${message}`);
         } catch (ex) {
-            log.error(ex.message);//.data.message);
-            setMessage(ex.message);
+            let message;
+            if (ex?.response?.data?.message) {
+                message = ex.response.data.message;
+            } else {
+                message = ex.message;
+            }
+            log.error(message);
+            setMessage(message);
         }
     }
 

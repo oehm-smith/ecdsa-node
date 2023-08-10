@@ -6,6 +6,7 @@ import WalletConnectSecureBrowserPlugin from './WalletConnectSecureBrowserPlugin
 import { prepareAddress } from "./Utils.js"
 import { createWallet } from "./wallets.js"
 import log from 'loglevel';
+import { StatusCodes } from "http-status-codes"
 
 const customStyles = {
   content: {
@@ -64,17 +65,24 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
     }
   }
 
+  const printWallets = (wallets) => {
+    return JSON.stringify(Object.keys(wallets).map((k, i) => (
+          { key: prepareAddress(k), balance: wallets[k].balance}
+        )), null, 2);
+  }
   async function getWallets(user) {
     try {
       const {
         data: { message, wallets },
       } = await server.get(`users/` + user);
-      log.info(`getWallets for ${user}, message: "${message}", wallets: \n${JSON.stringify(wallets.map(w => ({key: prepareAddress(w), balance: w.balance})), null, 2)}`);
+      log.info(`getWallets for ${user}, message: "${message}", wallets: \n${printWallets(wallets)}`);
       setWallets(wallets);
     } catch (ex) {
-      log.error(`ex response: ${JSON.stringify(ex)}`)
-      if (ex.response.status === 400) {
-        setMessage(`User doesnt exist: ${newUser} or hasn't wallets - create one`);
+      log.error(`ex response: ${ex}`)
+      if (ex?.response?.status === StatusCodes.GONE) {
+        setMessage(`User doesnt exist: ${user}`);
+      } else if (ex?.response?.status === StatusCodes.NOT_FOUND) {
+        setMessage(`User doesnt have any wallets: ${user} - create one`);
       } else {
         setMessage(ex.message);
       }

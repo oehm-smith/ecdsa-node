@@ -19,10 +19,15 @@ module.exports=function(app) {
         const { user } = req.body;
         // console.log(`add user: ${user}`);
 
-        let message = `User ${user} - created`;
-        userWallets.addUser(user)
+        try {
+            let message = `User ${user} - created`;
+            userWallets.addUser(user)
 
-        res.status(StatusCodes.CREATED).send({message});
+            return res.status(StatusCodes.CREATED).send({ message });
+        } catch (ex) {
+            logger.error(ex);
+            return res.status(StatusCodes.BAD_REQUEST).send({ message: "Error creating user - " + ex})
+        }
     })
 
     // Get users
@@ -66,8 +71,11 @@ module.exports=function(app) {
         const walletsMap = userWallets.getUser(user);
 
         if (!walletsMap) {
-            message = `user doesn't exist (no wallets): ${user}`;
-            res.status(StatusCodes.NOT_FOUND).send({ data: message })
+            message = `user doesn't exist: ${user}`;
+            res.status(StatusCodes.GONE).send({ message })
+        } else if (walletsMap.size == 0) {
+            message = `user doesn't have any wallets: ${user}`;
+            res.status(StatusCodes.NOT_FOUND).send({ message })
         } else {
             const wallets = Object.fromEntries(walletsMap);
             res.send({ message: "all good", wallets })
