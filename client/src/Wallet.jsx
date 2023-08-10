@@ -69,7 +69,7 @@ function Wallet({ publicKey, setPublicKey, balance, setBalance, loggedInUser, se
       const {
         data: { message, wallets },
       } = await server.get(`users/` + user);
-      log.info(`getWallets for: ${user}, message: "${message}", wallets: ${JSON.stringify(wallets)}`);
+      log.info(`getWallets for ${user}, message: "${message}", wallets: \n${JSON.stringify(wallets.map(w => ({key: prepareAddress(w), balance: w.balance})), null, 2)}`);
       setWallets(wallets);
     } catch (ex) {
       log.error(`ex response: ${JSON.stringify(ex)}`)

@@ -29,11 +29,15 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
   function displaySuccessNotification(message) {
-    toast(`Transfer ${message.amount} from ${message.from} to ${message.to}`);
+    const msg = `Transfer ${message.amount} from ${message.from} to ${message.to}`;
+    toast(msg);
+    log.info(msg);
   }
 
   function displayNotEnoughFundsNotification(from, amount) {
-    toast(`Unable to transfer ${amount} from ${from} - not enough funds (only has ${balance})`);
+    const msg = `Unable to transfer ${amount} from ${from} - not enough funds (only has ${balance})`;
+    toast(msg);
+    log.error(msg);
   }
 
   async function performTransfer() {
@@ -53,7 +57,6 @@ function Transfer({ publicKey, balance, setBalance, loggedInUser, transferDialog
       if (message) {
         displaySuccessNotification(message);
       }
-      log.info(JSON.stringify(message))
     } catch (ex) {
       log.error(ex);
     }

@@ -1,6 +1,6 @@
 const Logger = require("./Logger")
 const { StatusCodes } = require("http-status-codes")
-const { unserialize } = require("./Utils")
+const { unserialize, prepareAddress } = require("./Utils")
 const { hexToBytes, bytesToUtf8 } = require("ethereum-cryptography/utils")
 const JSONbig = require('json-bigint')({ useNativeBigInt: true });
 
@@ -99,9 +99,9 @@ module.exports=function(app) {
         try {
             const userAlreadyExisted = userWallets.createUpdateUserWallet(user, publicKey, balance);
 
-            message = `User existed - added new public key for ${user} - ${publicKey}`;
+            message = `User existed - added new public key for ${user} - ${prepareAddress(publicKey)}`;
             if (!userAlreadyExisted) {
-                message = `User didnt exist - created them and added new public key: ${user}, ${publicKey}`;
+                message = `User didnt exist - created them and added new public key: ${user}, ${prepareAddress(publicKey)}`;
             }
             res.send({ message })
         } catch (ex) {

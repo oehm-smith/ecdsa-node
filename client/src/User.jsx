@@ -59,7 +59,6 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
     }
 
     async function addNewUser(theNewUser){
-        log.debug(`addNewUser: ${theNewUser}`)
         try {
             const {
                 data: { message },
@@ -67,7 +66,7 @@ function User({ loggedInUser, setLoggedInUser, users, setUsers, message, setMess
                 user: theNewUser,
             });
             // setLoggedInUser(theNewUser);
-            log.debug(`addNewUser: ${theNewUser} - response: ${message}`);
+            log.info(`addNewUser: ${theNewUser} - response: ${message}`);
         } catch (ex) {
             log.error(ex.message);//.data.message);
             setMessage(ex.message);

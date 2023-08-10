@@ -24,6 +24,7 @@ export default class WalletConnectSecureBrowserPlugin {
         const publicKeyHex = toHex(publicKey);
         this.publicPrivateKeys.set(publicKeyHex, privateKey);
         log.info(`Create public key: ${prepareAddress(publicKeyHex)} with private key: ${prepareAddress(toHex(privateKey))}`)
+        log.debug(`  Now have this many public keys: ${this.publicPrivateKeys.size}`)
         return publicKeyHex;
     }
 
