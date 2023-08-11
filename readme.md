@@ -37,4 +37,9 @@ For Oehmsmith's fork of this project.
 1. Users - this is a simulation of multiple users in a browser and provides a logical way to switch between different users that have different wallets.  An input box was chosen over a dropdown since as an input it can double for the use of 'create' user
 2. Wallet Connect - This is like a simulation of MetaMask etc... and each user has a collection of wallets.  Selecting the first of a user's wallets will require a login to the wallets
 3. Dropdown containing all wallets in Transfer dialog.  This was decided upon instead of typing wallet addresses to make things simpler for users of this simple application.
-4. 
+
+## Alchemy University Submission
+
+I wrote this description in the submission form.
+
+I wanted to easily work with multiple users who can have multiple wallets.  I implemented a mock of multiple browser users like Chrome provides. Each user has a sandboxed environment that includes a Metamask or similar, each with its own password.  You can create dummy users with an initial wallet by pressing the 'dummy' button.  Or you can create users.  Then you can choose a user and then can select a wallet.  The first wallet selection for a user requests entering the password.  NOTE that no password is actually required in this mock - just press Submit.  From there you are able to transfer tokens from the chosen wallet to any others.  The 'any other wallets' to send to is in a drop-down to make it easier.  My initial instance has a bug where the chosen wallet is not cleared such as after choosing a new user.  I will fix this.  I will also get a live deployment happening, and hopefully I can update this project submission information when done.
